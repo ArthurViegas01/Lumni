@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "Lumni — infraestrutura, software e automação para empresas",
+    "description": "Infraestrutura, desenvolvimento de software e automação de processos com um único time responsável. Porto Alegre e remoto."
+  },
+  "nav": {
+    "home": "Lumni, página inicial",
+    "cta": "Falar com o time",
+    "switchLanguage": "English",
+    "switchLanguageLabel": "Ver o site em inglês",
+    "skip": "Pular para o conteúdo",
+    "label": "Principal",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "links": [
+      {
+        "label": "Frentes",
+        "anchor": "frentes"
+      },
+      {
+        "label": "Como trabalhamos",
+        "anchor": "processo"
+      },
+      {
+        "label": "Especialidades",
+        "anchor": "especialidades"
+      },
+      {
+        "label": "Dúvidas",
+        "anchor": "faq"
+      }
+    ]
+  },
+  "story": {
+    "hero": {
+      "eyebrow": "Tecnologia para empresas",
+      "title": "Infraestrutura, software e automação. Um só time responsável.",
+      "lead": "Você não precisa coordenar três fornecedores para resolver tecnologia. Um contrato cobre da rede ao sistema sob medida.",
+      "primary": "Falar com o time",
+      "secondary": "Ver como funciona"
+    },
+    "lines": {
+      "title": "Quatro frentes, uma entrega",
+      "lead": "Cada frente resolve uma dor diferente. Todas respondem ao mesmo responsável.",
+      "items": [
+        {
+          "name": "T.I. gerenciada",
+          "pain": "Quando algo cai, você sabe exatamente a quem ligar."
+        },
+        {
+          "name": "Automação de processos",
+          "pain": "O que hoje é planilha e retrabalho vira fluxo automático."
+        },
+        {
+          "name": "Squad sob demanda",
+          "pain": "O roadmap existe; agora existe quem construa."
+        },
+        {
+          "name": "Presença digital",
+          "pain": "Um site que traz cliente em vez de só existir."
+        }
+      ]
+    },
+    "team": {
+      "title": "Cada peça é uma especialidade",
+      "lead": "Um time com formação em áreas diferentes da tecnologia, trabalhando como um só.",
+      "specialties": [
+        "Infraestrutura e suporte",
+        "Desenvolvimento de software",
+        "Automação de processos",
+        "Controle e gestão",
+        "Sites e presença digital",
+        "Dados e integrações"
+      ]
+    },
+    "close": {
+      "title": "Um contrato. Um responsável.",
+      "lead": "Conte o que está travando sua operação. Respondemos com um diagnóstico, não com um orçamento genérico.",
+      "cta": "Solicitar diagnóstico"
+    }
+  },
+  "sections": {
+    "supplier": {
+      "eyebrow": "O problema",
+      "title": "Três fornecedores, e você no meio",
+      "lead": "Site com uma agência, automação com um freelancer, suporte com outra empresa. Quando algo falha entre eles, quem coordena é você.",
+      "company": "Sua empresa",
+      "vendors": ["Agência", "Freelancer", "Suporte T.I."],
+      "fronts": ["Infra", "Automação", "Squad", "Sites"],
+      "before": {
+        "title": "Hoje",
+        "caption": "Cada fornecedor responde por um pedaço. A integração entre eles fica sem dono."
+      },
+      "after": {
+        "title": "Com um só time",
+        "caption": "Um contrato cobre as quatro frentes. Um responsável responde pelo todo."
+      }
+    },
+    "process": {
+      "eyebrow": "Como trabalhamos",
+      "title": "Quatro etapas, prazos à vista",
+      "lead": "Você sabe o que acontece em cada fase antes de assinar qualquer coisa.",
+      "steps": [
+        {
+          "name": "Diagnóstico",
+          "duration": "Até 1 semana",
+          "text": "Entendemos a operação, os sistemas e onde o tempo se perde. Sai um relatório com prioridades."
+        },
+        {
+          "name": "Proposta",
+          "duration": "3 a 5 dias",
+          "text": "Escopo fechado: o que está e o que não está incluso, prazo e valor."
+        },
+        {
+          "name": "Execução",
+          "duration": "Por marcos",
+          "text": "Entregas curtas, com demonstração a cada marco e acesso ao andamento."
+        },
+        {
+          "name": "Sustentação",
+          "duration": "Contínua",
+          "text": "Monitoramento, suporte e evolução, com SLA definido em contrato."
+        }
+      ]
+    },
+    "stack": {
+      "eyebrow": "Tecnologia",
+      "title": "Ferramentas do dia a dia",
+      "items": [
+        "TypeScript",
+        "React",
+        "Next.js",
+        "Node.js",
+        "Python",
+        ".NET",
+        "PostgreSQL",
+        "SQL Server",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "Linux",
+        "Windows Server",
+        "Power Automate",
+        "n8n"
+      ]
+    },
+    "faq": {
+      "eyebrow": "Dúvidas",
+      "title": "Perguntas que você vai fazer",
+      "items": [
+        {
+          "q": "Quanto custa?",
+          "a": "Depende do escopo. Depois do diagnóstico você recebe uma proposta com escopo fechado, prazo e valor — nada de estimativa em aberto."
+        },
+        {
+          "q": "Em quanto tempo começa?",
+          "a": "O diagnóstico começa assim que a conversa inicial confirma que faz sentido para os dois lados. O prazo de execução vem na proposta."
+        },
+        {
+          "q": "Como é o contrato?",
+          "a": "Projetos têm contrato por escopo. T.I. gerenciada e squad têm contrato recorrente, com SLA e condições de saída por escrito."
+        },
+        {
+          "q": "Quem me atende?",
+          "a": "Um responsável pelo seu contrato, que conhece o histórico e coordena as especialidades envolvidas."
+        },
+        {
+          "q": "E se algo der errado?",
+          "a": "O SLA define prazos de resposta e o que acontece se não forem cumpridos. Todo incidente ganha relatório com causa e correção."
+        },
+        {
+          "q": "Como faço para sair?",
+          "a": "As condições de saída estão no contrato. Documentação, acessos e código ficam com você."
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Contato",
+      "title": "Conte o que está travando sua operação",
+      "lead": "Respondemos com um diagnóstico, não com um orçamento genérico. O formulário de contato chega na próxima versão do site."
+    }
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados."
+  }
+}

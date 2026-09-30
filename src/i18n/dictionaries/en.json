@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "Lumni — infrastructure, software and automation for companies",
+    "description": "Infrastructure, custom software and process automation delivered by a single accountable team. Based in Porto Alegre, Brazil, working remotely."
+  },
+  "nav": {
+    "home": "Lumni, home page",
+    "cta": "Talk to the team",
+    "switchLanguage": "Português",
+    "switchLanguageLabel": "View the site in Portuguese",
+    "skip": "Skip to content",
+    "label": "Main",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "links": [
+      {
+        "label": "Services",
+        "anchor": "frentes"
+      },
+      {
+        "label": "How we work",
+        "anchor": "processo"
+      },
+      {
+        "label": "Expertise",
+        "anchor": "especialidades"
+      },
+      {
+        "label": "FAQ",
+        "anchor": "faq"
+      }
+    ]
+  },
+  "story": {
+    "hero": {
+      "eyebrow": "Technology for companies",
+      "title": "Infrastructure, software and automation. One accountable team.",
+      "lead": "You shouldn't have to coordinate three vendors to solve technology. One contract covers everything from the network to custom software.",
+      "primary": "Talk to the team",
+      "secondary": "See how it works"
+    },
+    "lines": {
+      "title": "Four fronts, one delivery",
+      "lead": "Each front solves a different problem. All of them answer to the same person.",
+      "items": [
+        {
+          "name": "Managed IT",
+          "pain": "When something breaks, you know exactly who to call."
+        },
+        {
+          "name": "Process automation",
+          "pain": "Spreadsheets and rework become automated flows."
+        },
+        {
+          "name": "On-demand squad",
+          "pain": "You have the roadmap; now you have the people to build it."
+        },
+        {
+          "name": "Digital presence",
+          "pain": "A website that brings clients instead of just existing."
+        }
+      ]
+    },
+    "team": {
+      "title": "Every piece is a specialty",
+      "lead": "A team trained across different areas of technology, working as one.",
+      "specialties": [
+        "Infrastructure and support",
+        "Software development",
+        "Process automation",
+        "Operations and management",
+        "Websites and digital presence",
+        "Data and integrations"
+      ]
+    },
+    "close": {
+      "title": "One contract. One accountable team.",
+      "lead": "Tell us what is holding your operation back. We answer with a diagnosis, not a generic quote.",
+      "cta": "Request a diagnosis"
+    }
+  },
+  "sections": {
+    "supplier": {
+      "eyebrow": "The problem",
+      "title": "Three vendors, and you in the middle",
+      "lead": "A website from an agency, automation from a freelancer, support from yet another company. When something breaks between them, you are the one coordinating.",
+      "company": "Your company",
+      "vendors": ["Agency", "Freelancer", "IT support"],
+      "fronts": ["Infra", "Automation", "Squad", "Web"],
+      "before": {
+        "title": "Today",
+        "caption": "Each vendor owns a piece. Nobody owns the integration between them."
+      },
+      "after": {
+        "title": "With one team",
+        "caption": "One contract covers all four fronts. One accountable person answers for the whole."
+      }
+    },
+    "process": {
+      "eyebrow": "How we work",
+      "title": "Four stages, deadlines up front",
+      "lead": "You know what happens in each stage before you sign anything.",
+      "steps": [
+        {
+          "name": "Diagnosis",
+          "duration": "Up to 1 week",
+          "text": "We map your operation, your systems and where time gets lost. You get a report with priorities."
+        },
+        {
+          "name": "Proposal",
+          "duration": "3 to 5 days",
+          "text": "Fixed scope: what is and is not included, timeline and price."
+        },
+        {
+          "name": "Delivery",
+          "duration": "By milestones",
+          "text": "Short deliveries, a demo at every milestone and visibility into progress."
+        },
+        {
+          "name": "Ongoing support",
+          "duration": "Continuous",
+          "text": "Monitoring, support and evolution, with an SLA defined in the contract."
+        }
+      ]
+    },
+    "stack": {
+      "eyebrow": "Technology",
+      "title": "Everyday tools",
+      "items": [
+        "TypeScript",
+        "React",
+        "Next.js",
+        "Node.js",
+        "Python",
+        ".NET",
+        "PostgreSQL",
+        "SQL Server",
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Azure",
+        "Linux",
+        "Windows Server",
+        "Power Automate",
+        "n8n"
+      ]
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Questions you will ask",
+      "items": [
+        {
+          "q": "How much does it cost?",
+          "a": "It depends on scope. After the diagnosis you get a proposal with fixed scope, timeline and price — no open-ended estimates."
+        },
+        {
+          "q": "How soon can you start?",
+          "a": "The diagnosis starts as soon as the first conversation confirms it makes sense for both sides. The delivery timeline is in the proposal."
+        },
+        {
+          "q": "What does the contract look like?",
+          "a": "Projects are contracted by scope. Managed IT and squads are recurring contracts, with an SLA and written exit terms."
+        },
+        {
+          "q": "Who is my point of contact?",
+          "a": "One person accountable for your contract, who knows the history and coordinates the specialties involved."
+        },
+        {
+          "q": "What if something goes wrong?",
+          "a": "The SLA defines response times and what happens if they are missed. Every incident gets a report with cause and fix."
+        },
+        {
+          "q": "How do I leave?",
+          "a": "Exit terms are in the contract. Documentation, access and code stay with you."
+        }
+      ]
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "Tell us what is holding your operation back",
+      "lead": "We answer with a diagnosis, not a generic quote. The contact form arrives in the next version of the site."
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}
