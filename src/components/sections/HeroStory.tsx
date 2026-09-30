@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
 import { Magnet } from "@/components/effects/Magnet";
-import { SpotlightCard } from "@/components/effects/SpotlightCard";
 import { CubePoster } from "@/components/scene/CubePoster";
 import { StoryScene } from "@/components/scene/StoryScene";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { StarBorder } from "@/components/ui/StarBorder";
+import { Heading } from "@/components/ui/Heading";
+import { HeroTitle } from "@/components/ui/HeroTitle";
+import type { ServiceContent } from "@/content/services";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import type { ServiceId } from "@/i18n/routes";
+import { ServiceCard } from "./ServicePages";
 
 type Side = "left" | "right";
 
@@ -42,24 +46,16 @@ function Stage({
   );
 }
 
-/** Título do hero com entrada por palavra em CSS (não espera hidratação: é o LCP). */
-function HeroTitle({ text }: { text: string }) {
-  const words = text.split(" ");
-  return (
-    <h1 aria-label={text} className="font-display text-hero text-ink">
-      {words.map((word, i) => (
-        <span key={`${word}-${i}`} aria-hidden>
-          <span className="word-in" style={{ ["--i" as string]: i }}>
-            {word}
-          </span>
-          {i < words.length - 1 ? " " : null}
-        </span>
-      ))}
-    </h1>
-  );
-}
-
-export function HeroStory({ story }: { story: Dictionary["story"] }) {
+export function HeroStory({
+  locale,
+  story,
+  services,
+}: {
+  locale: Locale;
+  story: Dictionary["story"];
+  /** Linhas disponíveis no idioma: vêm do conteúdo, não do dicionário (fonte única). */
+  services: { id: ServiceId; content: ServiceContent }[];
+}) {
   const { hero, lines, team, close } = story;
   return (
     <StoryScene poster={<CubePoster />} label={hero.eyebrow} callouts={team.specialties}>
@@ -78,35 +74,29 @@ export function HeroStory({ story }: { story: Dictionary["story"] }) {
       </Stage>
 
       <Stage side="right">
-        <h2 id="frentes" className="scroll-mt-24 font-display text-h2 text-ink">
+        <Heading id="frentes" className="scroll-mt-24">
           {lines.title}
-        </h2>
+        </Heading>
         <p className="mt-4 max-w-measure text-ink-quiet">{lines.lead}</p>
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
-          {lines.items.map((item, i) => {
-            const featured = i === 0;
-            const card = (
-              <SpotlightCard
-                className={`h-full p-4 ${featured ? "border-transparent bg-surface" : "border-border bg-surface/70"}`}
-              >
-                <p className="font-medium text-ink">{item.name}</p>
-                <p className="mt-1 text-sm text-ink-quiet">{item.pain}</p>
-              </SpotlightCard>
-            );
-            // A primeira frente (T.I. gerenciada) é a prioritária: ganha a borda com brilho.
-            return (
-              <li key={item.name}>
-                {featured ? <StarBorder className="h-full">{card}</StarBorder> : card}
-              </li>
-            );
-          })}
+          {services.map((service, i) => (
+            <li key={service.id}>
+              {/* A primeira linha (T.I. gerenciada) é a prioritária: ganha a borda com brilho. */}
+              <ServiceCard
+                locale={locale}
+                service={service}
+                cta={lines.cardCta}
+                featured={i === 0}
+              />
+            </li>
+          ))}
         </ul>
       </Stage>
 
       <Stage side="left" theme="light" narrow>
-        <h2 id="especialidades" className="scroll-mt-24 font-display text-h2 text-ink">
+        <Heading id="especialidades" className="scroll-mt-24">
           {team.title}
-        </h2>
+        </Heading>
         <p className="mt-4 max-w-measure text-ink-quiet">{team.lead}</p>
         {/* No desktop as especialidades aparecem como rótulos presos às peças do cubo;
             a lista continua no DOM para leitores de tela e para o mobile. */}
@@ -120,7 +110,7 @@ export function HeroStory({ story }: { story: Dictionary["story"] }) {
       </Stage>
 
       <Stage side="left">
-        <h2 className="font-display text-h2 text-ink">{close.title}</h2>
+        <Heading>{close.title}</Heading>
         <p className="mt-4 max-w-measure text-lg text-ink-quiet">{close.lead}</p>
         <div className="mt-8">
           <Magnet>

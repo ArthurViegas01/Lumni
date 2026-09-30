@@ -8,26 +8,22 @@ import {
   StackSection,
   SupplierSection,
 } from "@/components/sections/HomeSections";
-import { hasLocale, htmlLang, locales } from "@/i18n/config";
+import { listServices } from "@/content/services";
+import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
   if (!hasLocale(locale)) notFound();
   const { meta } = await getDictionary(locale);
-
-  return {
-    title: { absolute: meta.title },
+  return pageMetadata({
+    locale,
+    route: { name: "home" },
+    title: meta.title,
     description: meta.description,
-    alternates: {
-      canonical: `/${locale}`,
-      languages: {
-        ...Object.fromEntries(locales.map((l) => [htmlLang[l], `/${l}`])),
-        "x-default": "/pt",
-      },
-    },
-    openGraph: { title: meta.title, description: meta.description, locale: htmlLang[locale] },
-  };
+    absoluteTitle: true,
+  });
 }
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
@@ -37,7 +33,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   return (
     <>
-      <HeroStory story={story} />
+      <HeroStory locale={locale} story={story} services={listServices(locale)} />
       <SupplierSection data={sections.supplier} />
       <ProcessSection data={sections.process} />
       <StackSection data={sections.stack} />

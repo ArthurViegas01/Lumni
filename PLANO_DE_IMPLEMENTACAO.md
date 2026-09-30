@@ -1,8 +1,8 @@
 # Plano de implementação — site Lumni
 
-> **Versão do plano:** 1.1 · **Atualizado em:** 30/09/2026 · **Versão do código:** 0.2.0
-> **Onde estamos:** Fases 0 e 1 com código pronto; Fase 3 quase fechada (falta o Figma); Fases 4 e 5 com a home e o hero bem adiantados. Detalhe por item na seção 5.
-> **Próxima ação:** medir o hero num Android intermediário (roteiro 4.2) e revisar a copy provisória (Fase 2, pendências P8–P11).
+> **Versão do plano:** 1.2 · **Atualizado em:** 30/09/2026 · **Versão do código:** 0.3.0
+> **Onde estamos:** Fases 0 e 1 com código pronto; Fase 3 quase fechada (falta o Figma); home, hero, páginas de serviço, hub e time no ar; rotas traduzidas (parte da Fase 8) e E2E com Playwright entregues na v0.3.0. Detalhe por item na seção 5.
+> **Próxima ação:** tornar o repositório privado (D20); validar a copy das páginas de serviço e decidir a faixa de preço (P10, P12, P13); medir o hero num Android intermediário (roteiro 4.2).
 
 Este documento é a fonte da verdade técnica do site. Ele diz **o que** construir, **como**, **em que ordem** e **como saber que está pronto**. Decisões de negócio e posicionamento vivem no documento de planejamento; aqui ficam só as que afetam código.
 
@@ -50,6 +50,9 @@ Regra de manutenção: toda decisão nova entra na tabela da seção 1; toda ent
 | D20 | Licença do React Bits   | **Uso permitido no site; repo privado recomendado**                                                                                      | MIT + Commons Clause: pode usar como parte do site, não pode redistribuir os componentes em si. Registro em `THIRD_PARTY_NOTICES.md`                                                             | 30/09 |
 | D21 | Orçamento de JS         | **Meta revista para ≤ 220 KB gzip** (antes 200)                                                                                          | Medido: o framework Next/React sozinho ocupa ~177 KB; 200 KB deixaria 23 KB para o site inteiro. A meta agora separa framework e código nosso                                                    | 30/09 |
 | D22 | Motion e three          | **Manter `useFrame` + função pura**; não usar o `threeEffect` (`motion/three`) que o Motion 13 publicou                                  | O `threeEffect` escreve a cada frame no loop do Motion e brigaria com o `frameloop="demand"` do R3F, que é o que zera o custo parado                                                             | 30/09 |
+| D23 | URLs traduzidas         | **`rewrites` + `redirects` no `next.config.ts`**, gerados de `i18n/routes.ts`; o `proxy.ts` só negocia o idioma                          | No Next 16 a ordem é redirects → proxy → rewrites `beforeFiles` → arquivos: a config resolve sem código em runtime, é testável como dado e o proxy fica trivial                                  | 30/09 |
+| D24 | E2E                     | **Playwright contra `next start`**, desktop + mobile, `reducedMotion: "reduce"` por padrão; antecipado para a v0.3.0                     | Proxy, rewrites e redirects só se comportam como em produção no build; movimento reduzido deixa o teste determinístico (um spec cobre os dois modos)                                             | 30/09 |
+| D25 | Ordem das fases         | **Registro de rotas e slugs em inglês (Fase 8) adiantados para a v0.3.0**                                                                | As páginas de serviço precisavam de links; escrever URLs à mão para migrar depois custaria mais                                                                                                  | 30/09 |
 
 ---
 
@@ -125,15 +128,15 @@ Estado atual (✅) e o que entra em cada fase (🔜 Fn).
 │   └── blog/*.mdx                 🔜 F7
 ├── scripts/
 │   └── posters.mjs                🔜 F4 converte PNGs da cena em AVIF (sharp)
-├── tests/                         🔜 F4 Playwright: visual, e2e, a11y
+├── e2e/ + playwright.config.ts   ✅ Playwright: roteamento, SEO, navegação, a11y (axe), revelação
 └── src/
-    ├── proxy.ts                   ✅ prefixo de idioma; 🔜 F8 reescrita de slugs traduzidos
+    ├── proxy.ts                   ✅ negocia o idioma de URLs sem prefixo (slugs traduzidos: next.config, D23)
     ├── app/
     │   ├── [locale]/
     │   │   ├── layout.tsx         ✅ html lang, fontes, header, footer, generateStaticParams
     │   │   ├── page.tsx           ✅ home
-    │   │   ├── servicos/          🔜 F5 page.tsx (hub) + [slug]/page.tsx
-    │   │   ├── time/ cases/       🔜 F5
+    │   │   ├── servicos/          ✅ page.tsx (hub) + [slug]/page.tsx
+    │   │   ├── time/              ✅ (cases/ 🔜 F5)
     │   │   ├── contato/           🔜 F6 page.tsx + actions.ts (Server Action)
     │   │   ├── privacidade/       🔜 F6
     │   │   ├── blog/              🔜 F7
@@ -147,12 +150,13 @@ Estado atual (✅) e o que entra em cada fase (🔜 Fn).
     │   ├── layout/                ✅ SiteHeader, SiteFooter
     │   ├── motion/                ✅ MotionProvider (LazyMotion estrito), Reveal
     │   ├── effects/               ✅ BlurReveal, Scramble, SpotlightCard, Magnet, GridBackdrop, ScrollLine, SupplierDiagram (client)
-    │   ├── interactive/           ✅ MobileMenu (client)
+    │   ├── interactive/           ✅ MobileMenu, LanguageLink (client)
     │   ├── scene/                 ✅ cubeState, progress, Cube, SceneCanvas, StoryScene, CubePoster, color, capabilities, types
-    │   ├── sections/              ✅ HeroStory, HomeSections (problema, processo, stack, FAQ, contato)
+    │   ├── sections/              ✅ HeroStory, HomeSections, Blocks, ServicePages, TeamPage
     │   └── ui/                    ✅ Button, Section/Container, Eyebrow, StarBorder, Ticker (server)
-    ├── i18n/                      ✅ config, negotiate, dictionaries; 🔜 F8 routes.ts
-    └── lib/                       ✅ site, motion; 🔜 F6 lead/, F9 seo.ts
+    ├── i18n/                      ✅ config, negotiate, dictionaries, routes (registro de URLs), navigation
+    ├── lib/                       ✅ site, motion, seo; 🔜 F6 lead/
+    └── content/services/*.ts      ✅ dados tipados das 4 linhas (pt + en no mesmo arquivo)
 ```
 
 ### 3.3 Renderização e fronteiras cliente/servidor
@@ -173,14 +177,13 @@ Estado atual (✅) e o que entra em cada fase (🔜 Fn).
 3. Dicionários em `src/i18n/dictionaries/{pt,en}.json`. O tipo `Dictionary` é inferido do português; o teste `dictionaries.test.ts` falha se o inglês tiver chave ou tamanho de lista diferente, ou texto vazio.
 4. Metadados: `canonical` por idioma, `alternates.languages` com `pt-BR`, `en` e `x-default` → `/pt`. O `sitemap.xml` repete o hreflang.
 
-**O que entra na Fase 8 (🔜) — slugs traduzidos:**
+**Slugs traduzidos (✅ v0.3.0, adiantado da Fase 8 — D25):**
 
-As pastas do `app/` usam o nome em português (`servicos`, `contato`). O inglês precisa de `/en/services/managed-it`. Solução sem duplicar rotas:
-
-- `src/i18n/routes.ts` com o mapa de segmentos por idioma e a função `href(locale, routeKey, params?)`. **Nenhum link do site é escrito à mão** — todos passam por `href`.
-- `proxy.ts` faz `NextResponse.rewrite` de `/en/services/managed-it` para `/en/servicos/ti-gerenciada` (interno, a URL do navegador não muda) e `redirect 308` de `/en/servicos/...` para a forma em inglês, para não existir conteúdo duplicado.
-- Teste de unidade: todo par (`routeKey`, idioma) resolve para uma URL e volta para a mesma rota interna.
-- `hreflang` só entre páginas que existem nos dois idiomas. Página só em pt não declara alternate `en`.
+- `src/i18n/routes.ts` é o **registro de rotas**: segmentos por idioma, slugs por linha e em quais idiomas cada página existe. `href(locale, route, hash?)` gera **todo link interno** e lança erro no build se a página não existe no idioma.
+- `next.config.ts` gera `rewrites.beforeFiles` (pública → pasta interna) e `redirects` 308 (interna → pública) a partir do registro (D23).
+- `proxy.ts` só negocia o idioma de URLs sem prefixo (307).
+- Troca de idioma: `LanguageLink` usa `equivalentHref(usePathname(), alvo)` — mesma página no outro idioma ou o pai mais próximo (serviço → hub → home). `matchPath` aceita forma pública e interna (na pré-renderização o `usePathname()` devolve a interna).
+- `hreflang` e `sitemap.xml` só entre idiomas em que a página existe.
 
 ### 3.5 Hero 3D
 
@@ -368,28 +371,28 @@ Quando o naming for decidido, os pontos de troca são:
 
 Medido na v0.1.0 com `gzip -9` sobre os arquivos do build (a Vercel serve Brotli, ~15% menor). Metas valem para a home em produção.
 
-| Métrica                   | Meta                                   | v0.1.0                                   | Como medir                                  |
-| ------------------------- | -------------------------------------- | ---------------------------------------- | ------------------------------------------- |
-| JS inicial (antes do 3D)  | ≤ 220 KB gzip (D21)                    | v0.1.0: 224 KB · **v0.2.0: 213 KB** ✅   | scripts do HTML de `/pt`; `npm run analyze` |
-| Chunk da cena 3D          | ≤ 250 KB gzip                          | **242 KB** ✅                            | idem                                        |
-| Fontes                    | ≤ 150 KB, 2 com preload                | 139 KB, 2 com preload ✅                 | `.next/static/media`                        |
-| LCP (4G simulado, mobile) | ≤ 2,0 s                                | a medir                                  | Lighthouse CI (F10)                         |
-| CLS                       | ≤ 0,02                                 | a medir                                  | Lighthouse CI                               |
-| INP                       | ≤ 200 ms                               | a medir                                  | Speed Insights                              |
-| FPS do hero               | 60 desktop; ≥ 45 Android intermediário | a medir                                  | roteiro 4.2                                 |
-| GPU com página parada     | 0 frames                               | ✅ por construção (`frameloop="demand"`) | Performance panel                           |
+| Métrica                   | Meta                                   | v0.1.0                                                                 | Como medir                                  |
+| ------------------------- | -------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------- |
+| JS inicial (antes do 3D)  | ≤ 220 KB gzip (D21)                    | v0.1.0: 224 · v0.2.0: 213 · **v0.3.0: 208 KB** (demais páginas 204) ✅ | scripts do HTML de `/pt`; `npm run analyze` |
+| Chunk da cena 3D          | ≤ 250 KB gzip                          | **242 KB** ✅                                                          | idem                                        |
+| Fontes                    | ≤ 150 KB, 2 com preload                | 139 KB, 2 com preload ✅                                               | `.next/static/media`                        |
+| LCP (4G simulado, mobile) | ≤ 2,0 s                                | a medir                                                                | Lighthouse CI (F10)                         |
+| CLS                       | ≤ 0,02                                 | a medir                                                                | Lighthouse CI                               |
+| INP                       | ≤ 200 ms                               | a medir                                                                | Speed Insights                              |
+| FPS do hero               | 60 desktop; ≥ 45 Android intermediário | a medir                                                                | roteiro 4.2                                 |
+| GPU com página parada     | 0 frames                               | ✅ por construção (`frameloop="demand"`)                               | Performance panel                           |
 
 **Composição do JS inicial (v0.2.0):** framework Next/React ~177 KB (fixo) + código do site ~36 KB, Motion incluído. Com o `LazyMotion`, a v0.2.0 ficou **11 KB menor que a v0.1.0 mesmo com 9 componentes de efeito novos**; as features de animação (~11 KB) chegam depois do primeiro paint. Regra: o código do site (tudo além do framework) não passa de 45 KB gzip.
 
 ### 4.2 Estratégia de testes
 
-| Camada         | Ferramenta               | O que cobre                                                                                                                                         | Quando                                |
-| -------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| Unidade        | Vitest                   | Funções puras: `cubeStateAt` e curvas, `negotiateLocale`, paridade dos dicionários, `mixHex`; depois `href`/rotas, schema do lead, schema de artigo | ✅ desde a v0.1.0; cresce a cada fase |
-| Visual         | Playwright + `?freeze=1` | Screenshot da home em 7 pontos do scroll (0, 17, 33, 50, 67, 83, 100%), desktop 1440×900 e mobile 390×844; diff contra a base                       | F4                                    |
-| E2E            | Playwright               | Redirecionamento de idioma, troca de idioma, navegação, envio do formulário (com provedor de e-mail mockado), 404                                   | F6                                    |
-| Acessibilidade | @axe-core/playwright     | Zero violação séria ou crítica em todas as rotas, nos dois temas                                                                                    | F10 (roda desde F4)                   |
-| Desempenho     | Lighthouse CI            | Metas da tabela 4.1; falha o pipeline                                                                                                               | F10                                   |
+| Camada         | Ferramenta               | O que cobre                                                                                                                                           | Quando                                |
+| -------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Unidade        | Vitest                   | Funções puras: `cubeStateAt` e curvas, `negotiateLocale`, paridade dos dicionários, `mixHex`; depois `href`/rotas, schema do lead, schema de artigo   | ✅ desde a v0.1.0; cresce a cada fase |
+| Visual         | Playwright + `?freeze=1` | Screenshot da home em 7 pontos do scroll (0, 17, 33, 50, 67, 83, 100%), desktop 1440×900 e mobile 390×844; diff contra a base                         | F4                                    |
+| E2E            | Playwright               | Idioma, 307/308/404, canonical/hreflang, troca de idioma, navegação, menu mobile, 404, revelações visíveis com e sem reduced motion; formulário na F6 | ✅ v0.3.0 (D24)                       |
+| Acessibilidade | @axe-core/playwright     | Zero violação séria/crítica em 9 rotas; contraste das etapas do hero medido com a cor real do palco                                                   | ✅ v0.3.0, bloqueia a CI              |
+| Desempenho     | Lighthouse CI            | Metas da tabela 4.1; falha o pipeline                                                                                                                 | F10                                   |
 
 **Roteiro de medição do spike em aparelho real (critério de saída da Fase 1):**
 
@@ -410,7 +413,7 @@ Medido na v0.1.0 com `gzip -9` sobre os arquivos do build (a Vercel serve Brotli
 
 ### 4.4 CI/CD e ambientes
 
-- **CI** (`.github/workflows/ci.yml`, ✅): em todo push para `main` e todo PR — `npm ci`, lint, typecheck, testes, formatação, build. Node pela `.nvmrc`.
+- **CI** (`.github/workflows/ci.yml`, ✅): push para `main` e PR — `npm ci`, lint, typecheck, testes, formatação, build e E2E (Playwright + axe) contra o build. Node pela `.nvmrc`.
 - **Vercel** (F10, pode ser antes): preview por PR, produção em `main`. Variável `NEXT_PUBLIC_SITE_URL` por ambiente.
 - **Proteção de `main`:** merge só com CI verde e revisão.
 - **Lighthouse CI e testes Playwright** entram no mesmo workflow quando existirem (F4/F10).
@@ -435,10 +438,10 @@ Legenda: ✅ feito · 🟡 em andamento · ⬜ não iniciado. Estimativas em hor
 | 2 · Conteúdo e copy                    | —             | 🟡     | 30 h (copy provisória na 0.2.0) |
 | 3 · Design system e componentes        | 0.2.0         | 🟡     | 45 h (~35 feitas)               |
 | 4 · Hero 3D de produção                | 0.2.0 → 0.3.0 | 🟡     | 60 h (~20 feitas)               |
-| 5 · Páginas de serviço, time e cases   | 0.2.0 → 0.4.0 | 🟡     | 45 h (~12 feitas)               |
+| 5 · Páginas de serviço, time e cases   | 0.2.0 → 0.4.0 | 🟡     | 45 h (~30 feitas)               |
 | 6 · Contato, leads e LGPD              | 0.6.0         | ⬜     | 30 h                            |
 | 7 · Blog                               | 0.7.0         | ⬜     | 20 h                            |
-| 8 · Inglês completo e slugs traduzidos | 0.8.0         | ⬜     | 20 h                            |
+| 8 · Inglês completo e slugs traduzidos | 0.3.0 → 0.8.0 | 🟡     | 20 h (~10 feitas, D25)          |
 | 9 · SEO técnico, OG e analytics        | 0.9.0         | ⬜     | 20 h                            |
 | 10 · Endurecimento e lançamento        | 1.0.0         | ⬜     | 30 h                            |
 
@@ -523,15 +526,15 @@ Legenda: ✅ feito · 🟡 em andamento · ⬜ não iniciado. Estimativas em hor
 
 ### Fase 5 · Páginas de serviço, time e cases 🟡 (v0.2.0 → v0.4.0)
 
-- [ ] `content/services/*.ts` com o tipo `ServiceLine`; teste de que toda linha tem `pt` completo e, se tem `slug.en`, tem `en` completo
-- [ ] `servicos/page.tsx` (hub) e `servicos/[slug]/page.tsx` com `generateStaticParams` a partir dos dados
-- [ ] Estrutura da página de serviço: dor → inclusos → como funciona (etapas com prazo) → não incluso → investimento → prova → FAQ → CTA
-- [ ] Toda página de serviço linka `/time`; todo cartão da home linka sua linha
+- [x] (v0.3.0) `src/content/services/*.ts` com o tipo `ServiceLine`; teste de que toda linha tem `pt` completo e, se tem `slug.en`, tem `en` completo
+- [x] (v0.3.0) `servicos/page.tsx` (hub) e `servicos/[slug]/page.tsx` com `generateStaticParams` a partir dos dados
+- [x] (v0.3.0, falta a "prova" — P8/P13) Estrutura da página de serviço: dor → inclusos → como funciona (etapas com prazo) → não incluso → investimento → prova → FAQ → CTA
+- [x] (v0.3.0) Toda página de serviço linka `/time`; todo cartão da home linka sua linha
 - [x] Seções da home abaixo do hero: "três fornecedores vs um" (diagrama que se desenha), como trabalhamos (linha que preenche no scroll), faixa de tecnologias, FAQ, chamada de contato
 - [ ] Seção de números (só com números reais — P8) e de prova técnica/cases
-- [ ] `/time` e `/cases` (anonimizados até autorização)
+- [x] (v0.3.0) `/time` · [ ] `/cases` (anonimizados até autorização)
 
-**Aceite:** 4 páginas de serviço geradas estaticamente, ≥ 600 palavras cada; navegação interna completa; checagem de links quebrados no CI.
+**Aceite:** 4 páginas de serviço geradas estaticamente, ≥ 600 palavras cada; navegação interna completa; checagem de links quebrados no CI. _Hoje: ~400 palavras por página (P13); links verificados por E2E._
 
 ### Fase 6 · Contato, leads e LGPD ⬜ (v0.6.0)
 
@@ -554,10 +557,10 @@ Legenda: ✅ feito · 🟡 em andamento · ⬜ não iniciado. Estimativas em hor
 
 ### Fase 8 · Inglês completo e slugs traduzidos ⬜ (v0.8.0)
 
-- [ ] `i18n/routes.ts` com mapa de segmentos e `href()`; todo link do site migrado para `href()`
-- [ ] Rewrite `en → rota interna` e redirect 308 da forma não canônica no `proxy.ts`
-- [ ] Seletor de idioma leva para a página equivalente (não para a home) quando ela existe
-- [ ] Testes de ida e volta das rotas; hreflang só entre páginas equivalentes
+- [x] (v0.3.0) `i18n/routes.ts` com mapa de segmentos e `href()`; todo link do site migrado para `href()`
+- [x] (v0.3.0) Rewrite `en → rota interna` e redirect 308 da forma não canônica no `proxy.ts`
+- [x] (v0.3.0) Seletor de idioma leva para a página equivalente (não para a home) quando ela existe
+- [x] (v0.3.0) Testes de ida e volta das rotas; hreflang só entre páginas equivalentes
 
 ### Fase 9 · SEO técnico, OG e analytics ⬜ (v0.9.0)
 
@@ -635,6 +638,8 @@ Total estimado da v1.0: **~330 horas**. Três trilhas em paralelo depois da Fase
 | P9  | A faixa de tecnologias bate com o que o time realmente usa?                                                | Fase 2      | Lista provisória da v0.2.0            |
 | P10 | Prazos do "como trabalhamos" e respostas do FAQ (contrato, SLA, saída) valem como estão?                   | Fase 2      | Texto provisório da v0.2.0            |
 | P11 | E-mail ou WhatsApp de contato para a chamada final enquanto o formulário não existe?                       | Fase 6      | Sem botão na chamada final            |
+| P12 | Publicar faixa de preço por frente ou só o modelo de cobrança?                                             | Fase 5      | Só o modelo de cobrança               |
+| P13 | Inclusos, prazos, exclusões e FAQ de cada frente valem? Há casos reais para a "prova"?                     | Fase 5      | Texto provisório, sem prova           |
 
 ---
 

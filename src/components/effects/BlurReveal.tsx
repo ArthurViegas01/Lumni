@@ -29,9 +29,12 @@ const word: Variants = {
   shown: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.55, ease: EASE } },
 };
 
+// O servidor não sabe da preferência de movimento e renderiza `word.hidden` (com blur).
+// Se a variante reduzida não zerasse filter e y, o desfoque do HTML inicial ficaria
+// para sempre: toda variante trocada após a hidratação cobre as mesmas propriedades.
 const wordReduced: Variants = {
-  hidden: { opacity: 0 },
-  shown: { opacity: 1, transition: { duration: 0.35 } },
+  hidden: { opacity: 0, filter: "blur(0px)", y: 0 },
+  shown: { opacity: 1, filter: "blur(0px)", y: 0, transition: { duration: 0.35 } },
 };
 
 /** Título que entra palavra por palavra, saindo do desfoque, quando rola para a tela. */

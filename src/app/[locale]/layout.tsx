@@ -32,7 +32,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <MotionProvider>
           <SiteHeader locale={locale} nav={dict.nav} />
           <main id="conteudo">{children}</main>
-          <SiteFooter footer={dict.footer} />
+          <SiteFooter locale={locale} footer={dict.footer} nav={dict.nav} />
         </MotionProvider>
       </body>
     </html>

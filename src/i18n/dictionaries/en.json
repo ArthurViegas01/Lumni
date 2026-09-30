@@ -15,19 +15,21 @@
     "links": [
       {
         "label": "Services",
-        "anchor": "frentes"
+        "to": "services"
       },
       {
         "label": "How we work",
-        "anchor": "processo"
+        "to": "home",
+        "hash": "processo"
       },
       {
         "label": "Expertise",
-        "anchor": "especialidades"
+        "to": "team"
       },
       {
         "label": "FAQ",
-        "anchor": "faq"
+        "to": "home",
+        "hash": "faq"
       }
     ]
   },
@@ -40,26 +42,9 @@
       "secondary": "See how it works"
     },
     "lines": {
-      "title": "Four fronts, one delivery",
+      "title": "Every front, one delivery",
       "lead": "Each front solves a different problem. All of them answer to the same person.",
-      "items": [
-        {
-          "name": "Managed IT",
-          "pain": "When something breaks, you know exactly who to call."
-        },
-        {
-          "name": "Process automation",
-          "pain": "Spreadsheets and rework become automated flows."
-        },
-        {
-          "name": "On-demand squad",
-          "pain": "You have the roadmap; now you have the people to build it."
-        },
-        {
-          "name": "Digital presence",
-          "pain": "A website that brings clients instead of just existing."
-        }
-      ]
+      "cardCta": "See this service"
     },
     "team": {
       "title": "Every piece is a specialty",
@@ -86,7 +71,7 @@
       "lead": "A website from an agency, automation from a freelancer, support from yet another company. When something breaks between them, you are the one coordinating.",
       "company": "Your company",
       "vendors": ["Agency", "Freelancer", "IT support"],
-      "fronts": ["Infra", "Automation", "Squad", "Web"],
+      "fronts": ["Infra", "Support", "Automation", "Squad"],
       "before": {
         "title": "Today",
         "caption": "Each vendor owns a piece. Nobody owns the integration between them."
@@ -182,6 +167,74 @@
     }
   },
   "footer": {
+    "tagline": "Infrastructure, software and automation from one accountable team.",
+    "servicesTitle": "Services",
+    "companyTitle": "Company",
+    "languageTitle": "Language",
     "rights": "All rights reserved."
+  },
+  "servicesPage": {
+    "meta": {
+      "title": "Managed IT, process automation and software squads",
+      "description": "Managed IT, process automation and on-demand development squads. Every front under one contract and one accountable person."
+    },
+    "eyebrow": "Services",
+    "title": "Every front, one accountable team",
+    "lead": "Each service solves a different problem. All of them work the same way: diagnosis, a fixed-scope proposal, delivery with deadlines and one person accountable for the contract.",
+    "cardCta": "See details"
+  },
+  "servicePage": {
+    "backToServices": "All services",
+    "primary": "Talk to the team",
+    "secondary": "How it works",
+    "included": "What is included",
+    "steps": "How it works",
+    "excluded": "What is not included",
+    "excludedLead": "Saying what is out of scope avoids wasted meetings and wrong expectations.",
+    "pricing": "Pricing",
+    "faq": "Questions about this service",
+    "others": "Other services",
+    "teamLink": "Meet the team's expertise"
+  },
+  "teamPage": {
+    "meta": {
+      "title": "The team's expertise",
+      "description": "Infrastructure, software development, automation, data, operations and web: a team trained in different fields, working as one."
+    },
+    "eyebrow": "The team",
+    "title": "Different specialties, one delivery",
+    "lead": "Training across different areas of technology, organized so the client talks to one accountable person — not five vendors.",
+    "specialtiesTitle": "What the team covers",
+    "specialties": [
+      {
+        "name": "Infrastructure and support",
+        "text": "Servers, networks, cloud, backups and day-to-day support."
+      },
+      {
+        "name": "Software development",
+        "text": "Custom systems, integrations and digital products, with reviewed and tested code."
+      },
+      {
+        "name": "Process automation",
+        "text": "Flows that replace spreadsheets, rework and manual copying between systems."
+      },
+      {
+        "name": "Operations and management",
+        "text": "Processes, metrics and management routines backed by technology."
+      },
+      {
+        "name": "Websites and digital presence",
+        "text": "Fast websites that are easy to find and built to generate leads."
+      },
+      {
+        "name": "Data and integrations",
+        "text": "Databases, APIs and dashboards that make the numbers trustworthy."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Tell us what is holding your operation back",
+    "lead": "We answer with a diagnosis, not a generic quote.",
+    "button": "Talk to the team"
   }
 }

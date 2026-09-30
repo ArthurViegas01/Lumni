@@ -43,3 +43,8 @@ next-env.d.ts
 
 # ferramentas locais
 .next-profiles/
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/

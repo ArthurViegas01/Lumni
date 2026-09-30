@@ -4,14 +4,17 @@ import { AnimatePresence, useReducedMotion } from "motion/react";
 import * as m from "motion/react-m";
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import type { Locale } from "@/i18n/config";
 import { DUR, EASE, STAGGER } from "@/lib/motion";
+import { LanguageLink } from "./LanguageLink";
 
 type NavLink = { label: string; href: string };
 
 type MobileMenuProps = {
   links: readonly NavLink[];
   cta: NavLink;
-  language: NavLink & { hrefLang: string; ariaLabel: string };
+  /** Idioma de destino: o link aponta para a página equivalente (ver LanguageLink). */
+  language: { target: Locale; label: string; ariaLabel: string };
   openLabel: string;
   closeLabel: string;
 };
@@ -103,14 +106,13 @@ export function MobileMenu({ links, cta, language, openLabel, closeLabel }: Mobi
             </ul>
           </nav>
           <div className="flex items-center justify-between gap-4">
-            <a
-              href={language.href}
-              hrefLang={language.hrefLang}
-              aria-label={language.ariaLabel}
+            <LanguageLink
+              target={language.target}
+              label={language.label}
+              ariaLabel={language.ariaLabel}
+              onClick={close}
               className="font-mono text-xs tracking-wide text-ink-quiet uppercase"
-            >
-              {language.label}
-            </a>
+            />
             <a
               href={cta.href}
               onClick={close}

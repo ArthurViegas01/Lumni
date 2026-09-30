@@ -21,6 +21,9 @@ Leia antes de qualquer alteração:
 | --- | --- |
 | Duração, easing, stagger, mola | `src/lib/motion.ts` (`DUR`, `EASE`, `STAGGER`, `SCROLL_SPRING`) |
 | Revelar ao entrar na tela | `src/components/motion/Reveal.tsx` |
+| Link interno (qualquer página) | `href(locale, route, hash?)` de `src/i18n/routes.ts` — **nunca** escreva URL à mão |
+| Conteúdo das páginas de serviço | `src/content/services/<id>.ts` |
+| Metadados de página (canonical, hreflang) | `pageMetadata` em `src/lib/seo.ts` |
 | Texto visível ao usuário | `src/i18n/dictionaries/pt.json` + `en.json` (mesma forma; o teste falha se divergirem) |
 | Idiomas, `lang`, idioma alternativo | `src/i18n/config.ts` |
 | Nome e URL do site | `src/lib/site.ts` |
@@ -45,6 +48,7 @@ Se não existir, crie no lugar certo da estrutura descrita no plano, não dentro
 - **Todo componente trazido é endurecido antes de entrar:** sem `setState` por movimento de mouse ou por frame (use variável CSS ou motion value), cor por token, `m.*` em vez de `motion.*`, reduced motion respeitado, texto acessível. Cabeçalho de atribuição no arquivo e linha em `THIRD_PARTY_NOTICES.md` (a licença exige).
 - **Motion+ (pago) não é usado.** anime.js não é dependência: as técnicas do animejs.com são feitas com Motion.
 - **Nada de efeito em loop contínuo** (canvas animado, cursor customizado, partículas): custo de bateria constante e cara de template.
+- **Variante reduzida cobre as mesmas propriedades da completa.** O servidor não conhece `prefers-reduced-motion` e renderiza o estado inicial da animação completa (blur, `pathLength: 0`); se a variante reduzida não desfizer cada propriedade, o conteúdo fica desfocado/invisível para sempre. O E2E `e2e/reveal.spec.ts` pega isso.
 - **`motion.*` quebra o site:** o `MotionProvider` roda `LazyMotion` em modo estrito. Importe `* as m from "motion/react-m"`.
 
 ## Estilo visual (não genérico)
@@ -72,6 +76,7 @@ Se não existir, crie no lugar certo da estrutura descrita no plano, não dentro
 ```bash
 npm run check   # lint + typecheck + testes + prettier
 npm run build
+npm run e2e     # Playwright contra o build (primeira vez: npx playwright install chromium)
 ```
 
 **Windows e o lockfile:** `npm install` no Windows pode remover do `package-lock.json` pacotes opcionais de outras plataformas (`@emnapi/*`), e aí o `npm ci` do CI falha. Para instalar o projeto use `npm ci`. Depois de adicionar uma dependência, rode `npm install --package-lock-only` e confira que o `git diff` do lockfile não removeu pacotes `@emnapi`.

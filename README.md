@@ -22,16 +22,17 @@ npm run dev                  # http://localhost:3000 -> redireciona para /pt ou 
 
 ## Scripts
 
-| Comando                           | O que faz                                                          |
-| --------------------------------- | ------------------------------------------------------------------ |
-| `npm run dev`                     | Servidor de desenvolvimento (Turbopack)                            |
-| `npm run build` / `npm start`     | Build de produção e servidor                                       |
-| `npm run lint`                    | ESLint (config do Next, flat config)                               |
-| `npm run typecheck`               | Gera os tipos de rota (`next typegen`) e roda `tsc`                |
-| `npm test` / `npm run test:watch` | Testes unitários (Vitest)                                          |
-| `npm run format` / `format:check` | Prettier com ordenação de classes Tailwind                         |
-| `npm run check`                   | lint + typecheck + testes + formatação — rode antes de todo commit |
-| `npm run analyze`                 | Analisador de bundle do Next (`next experimental-analyze`)         |
+| Comando                           | O que faz                                                                                             |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | Servidor de desenvolvimento (Turbopack)                                                               |
+| `npm run build` / `npm start`     | Build de produção e servidor                                                                          |
+| `npm run lint`                    | ESLint (config do Next, flat config)                                                                  |
+| `npm run typecheck`               | Gera os tipos de rota (`next typegen`) e roda `tsc`                                                   |
+| `npm test` / `npm run test:watch` | Testes unitários (Vitest)                                                                             |
+| `npm run format` / `format:check` | Prettier com ordenação de classes Tailwind                                                            |
+| `npm run e2e`                     | E2E Playwright contra o build (rode `npm run build` antes; 1ª vez: `npx playwright install chromium`) |
+| `npm run check`                   | lint + typecheck + testes + formatação — rode antes de todo commit                                    |
+| `npm run analyze`                 | Analisador de bundle do Next (`next experimental-analyze`)                                            |
 
 ## Estrutura
 
@@ -45,6 +46,7 @@ src/
     global-not-found.tsx 404 de URLs sem rota
     robots.ts sitemap.ts icon.svg
   proxy.ts               redireciona "/" para /pt ou /en pelo Accept-Language
+e2e/                     testes Playwright (roteamento, SEO, navegação, a11y)
   components/
     layout/              header e footer
     motion/              MotionProvider (LazyMotion estrito) e Reveal (client)
@@ -53,7 +55,8 @@ src/
     scene/               hero 3D: cubeState e progress (puros), Cube, SceneCanvas, StoryScene, pôster
     sections/            seções das páginas (Server Components)
     ui/                  Button, Section, Eyebrow, StarBorder, Ticker (Server Components)
-  i18n/                  idiomas, negociação, dicionários pt/en
+  content/services/      conteúdo tipado das páginas de serviço
+  i18n/                  idiomas, negociação, dicionários pt/en, registro de rotas (href)
   lib/                   constantes compartilhadas (site, motion)
 ```
 

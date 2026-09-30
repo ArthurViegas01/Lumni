@@ -1,20 +1,20 @@
 import Link from "next/link";
+import { LanguageLink } from "@/components/interactive/LanguageLink";
 import { MobileMenu } from "@/components/interactive/MobileMenu";
-import { alternateLocale, htmlLang, type Locale } from "@/i18n/config";
+import { alternateLocale, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import { resolveNavLinks } from "@/i18n/navigation";
+import { href } from "@/i18n/routes";
 import { site } from "@/lib/site";
 
 type SiteHeaderProps = { locale: Locale; nav: Dictionary["nav"] };
 
 export function SiteHeader({ locale, nav }: SiteHeaderProps) {
-  const other = alternateLocale(locale);
-  // Por enquanto a navegação aponta para seções da home; vira rotas na Fase 5.
-  const links = nav.links.map((link) => ({ label: link.label, href: `/${locale}#${link.anchor}` }));
-  const cta = { label: nav.cta, href: `/${locale}#contato` };
+  const links = resolveNavLinks(locale, nav.links);
+  const cta = { label: nav.cta, href: href(locale, { name: "home" }, "contato") };
   const language = {
+    target: alternateLocale(locale),
     label: nav.switchLanguage,
-    href: `/${other}`,
-    hrefLang: htmlLang[other],
     ariaLabel: nav.switchLanguageLabel,
   };
 
@@ -28,7 +28,7 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
       </a>
       <div className="mx-auto flex h-16 max-w-site items-center justify-between px-4 md:px-8">
         <Link
-          href={`/${locale}`}
+          href={href(locale, { name: "home" })}
           aria-label={nav.home}
           className="font-display text-xl font-semibold tracking-tight text-ink"
         >
@@ -39,32 +39,30 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
           <ul className="flex items-center gap-8">
             {links.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
                   className="text-sm text-ink-quiet transition-colors hover:text-ink"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <Link
-            href={language.href}
-            hrefLang={language.hrefLang}
-            aria-label={language.ariaLabel}
+          <LanguageLink
+            target={language.target}
+            label={language.label}
+            ariaLabel={language.ariaLabel}
             className="hidden rounded-sm px-2 py-1 font-mono text-xs tracking-wide text-ink-quiet uppercase hover:text-ink md:inline-block"
-          >
-            {language.label}
-          </Link>
-          <a
+          />
+          <Link
             href={cta.href}
             className="hidden rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-ink transition-opacity hover:opacity-90 sm:inline-block"
           >
             {cta.label}
-          </a>
+          </Link>
           <MobileMenu
             links={links}
             cta={cta}

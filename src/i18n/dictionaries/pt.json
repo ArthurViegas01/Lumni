@@ -14,20 +14,22 @@
     "closeMenu": "Fechar menu",
     "links": [
       {
-        "label": "Frentes",
-        "anchor": "frentes"
+        "label": "Serviços",
+        "to": "services"
       },
       {
         "label": "Como trabalhamos",
-        "anchor": "processo"
+        "to": "home",
+        "hash": "processo"
       },
       {
         "label": "Especialidades",
-        "anchor": "especialidades"
+        "to": "team"
       },
       {
         "label": "Dúvidas",
-        "anchor": "faq"
+        "to": "home",
+        "hash": "faq"
       }
     ]
   },
@@ -42,24 +44,7 @@
     "lines": {
       "title": "Quatro frentes, uma entrega",
       "lead": "Cada frente resolve uma dor diferente. Todas respondem ao mesmo responsável.",
-      "items": [
-        {
-          "name": "T.I. gerenciada",
-          "pain": "Quando algo cai, você sabe exatamente a quem ligar."
-        },
-        {
-          "name": "Automação de processos",
-          "pain": "O que hoje é planilha e retrabalho vira fluxo automático."
-        },
-        {
-          "name": "Squad sob demanda",
-          "pain": "O roadmap existe; agora existe quem construa."
-        },
-        {
-          "name": "Presença digital",
-          "pain": "Um site que traz cliente em vez de só existir."
-        }
-      ]
+      "cardCta": "Ver a frente"
     },
     "team": {
       "title": "Cada peça é uma especialidade",
@@ -182,6 +167,74 @@
     }
   },
   "footer": {
+    "tagline": "Infraestrutura, software e automação com um só time responsável.",
+    "servicesTitle": "Frentes",
+    "companyTitle": "Empresa",
+    "languageTitle": "Idioma",
     "rights": "Todos os direitos reservados."
+  },
+  "servicesPage": {
+    "meta": {
+      "title": "Serviços de T.I., automação, software e sites",
+      "description": "T.I. gerenciada, automação de processos, squad de desenvolvimento e presença digital. Quatro frentes sob um contrato e um responsável."
+    },
+    "eyebrow": "Serviços",
+    "title": "Quatro frentes, um responsável",
+    "lead": "Cada frente resolve uma dor diferente. Todas funcionam do mesmo jeito: diagnóstico, proposta com escopo fechado, execução com prazo e um responsável pelo contrato.",
+    "cardCta": "Ver detalhes"
+  },
+  "servicePage": {
+    "backToServices": "Todas as frentes",
+    "primary": "Falar com o time",
+    "secondary": "Como funciona",
+    "included": "O que está incluso",
+    "steps": "Como funciona",
+    "excluded": "O que não está incluso",
+    "excludedLead": "Dizer o que fica de fora evita reunião perdida e expectativa errada.",
+    "pricing": "Investimento",
+    "faq": "Dúvidas sobre esta frente",
+    "others": "Outras frentes",
+    "teamLink": "Conheça as especialidades do time"
+  },
+  "teamPage": {
+    "meta": {
+      "title": "Especialidades do time",
+      "description": "Infraestrutura, desenvolvimento, automação, dados, gestão e presença digital: um time com formações diferentes, trabalhando como um só."
+    },
+    "eyebrow": "O time",
+    "title": "Especialidades diferentes, uma entrega só",
+    "lead": "Formação em áreas distintas da tecnologia, organizada para que o cliente fale com um responsável — e não com cinco fornecedores.",
+    "specialtiesTitle": "O que o time cobre",
+    "specialties": [
+      {
+        "name": "Infraestrutura e suporte",
+        "text": "Servidores, redes, nuvem, backups e o atendimento do dia a dia."
+      },
+      {
+        "name": "Desenvolvimento de software",
+        "text": "Sistemas sob medida, integrações e produtos digitais, com código revisado e testado."
+      },
+      {
+        "name": "Automação de processos",
+        "text": "Fluxos que substituem planilha, retrabalho e cópia manual entre sistemas."
+      },
+      {
+        "name": "Controle e gestão",
+        "text": "Processos, indicadores e rotinas de gestão apoiados por tecnologia."
+      },
+      {
+        "name": "Sites e presença digital",
+        "text": "Sites rápidos, encontráveis e feitos para gerar contato."
+      },
+      {
+        "name": "Dados e integrações",
+        "text": "Bancos de dados, APIs e painéis que tornam os números confiáveis."
+      }
+    ]
+  },
+  "cta": {
+    "title": "Conte o que está travando sua operação",
+    "lead": "Respondemos com um diagnóstico, não com um orçamento genérico.",
+    "button": "Falar com o time"
   }
 }

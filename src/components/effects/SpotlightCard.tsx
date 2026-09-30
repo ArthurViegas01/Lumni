@@ -27,7 +27,7 @@ export function SpotlightCard({ children, className = "" }: SpotlightCardProps) 
       onPointerMove={trackPointer}
       className={`spotlight-card relative overflow-hidden rounded-lg border ${className}`}
     >
-      <div className="relative">{children}</div>
+      <div className="relative h-full">{children}</div>
     </div>
   );
 }

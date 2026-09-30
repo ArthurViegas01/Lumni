@@ -7,6 +7,53 @@ O mapa de versões até o lançamento (0.1 → 1.0) está em `PLANO_DE_IMPLEMENT
 
 _Nada ainda._
 
+## [0.3.0] - 2026-09-30
+
+Páginas de serviço, hub e time; URLs traduzidas em inglês; testes E2E com Playwright. Adianta a parte de rotas da Fase 8 (necessária para linkar as páginas novas) e cobre boa parte da Fase 5. **A copy das páginas novas é provisória** (Fase 2; pendências P10, P12 e P13).
+
+### Adicionado
+
+- **Registro de rotas** (`src/i18n/routes.ts`, testado): fonte única das URLs públicas por idioma. `href(locale, route, hash?)` gera todo link interno e falha no build se a página não existir no idioma; `equivalentHref` leva para a mesma página no outro idioma (ou para o pai mais próximo que exista lá).
+- **URLs em inglês de verdade:** `/en/services/managed-it`, `/en/services/automation`, `/en/services/squad`, `/en/team`. As pastas continuam em português; `next.config.ts` gera `rewrites` (pública → interna) e redirects **308** (interna → pública) a partir do registro, sem conteúdo duplicado (decisão D23).
+- **Páginas de serviço** (`/pt/servicos/[slug]`): dor → inclusos → como funciona (etapas com prazo) → o que não está incluso → investimento → FAQ → outras frentes → chamada. Geradas estaticamente a partir de `src/content/services/*.ts` (tipado; teste garante `pt` completo e `en` só onde a rota existe). Presença digital só em português.
+- **Hub de serviços** (`/pt/servicos`, `/en/services`) e **página do time** (`/pt/time`, `/en/team`) com as especialidades e a forma de trabalho.
+- **Metadados por página** (`src/lib/seo.ts`): `canonical` próprio e `hreflang` apenas entre idiomas em que a página existe (página só em pt não anuncia `en`); `sitemap.xml` gerado do registro de rotas.
+- **Troca de idioma para a página equivalente** no header, no menu mobile e no rodapé (antes levava sempre à home).
+- **Rodapé completo:** frentes publicadas no idioma, links da empresa, idioma.
+- Blocos de página reutilizáveis (`sections/Blocks.tsx`: `PageHero`, `SectionHeading`, `StepsSection`, `FaqList`, `CtaBand`), `ui/Heading` e `ui/HeroTitle`.
+- **Testes E2E com Playwright** (`e2e/`, `npm run e2e`) contra o build de produção, em desktop e mobile (decisão D24):
+  - roteamento: negociação de idioma, 307/308/404 esperados, arquivos de metadados fora do proxy;
+  - SEO: canonical, hreflang recíproco, um `h1` e um `title` por página;
+  - navegação: troca de idioma equivalente, hub → serviço, rodapé sem link quebrado, menu mobile por teclado, 404;
+  - acessibilidade: axe (WCAG 2.2 A/AA) sem violação séria ou crítica em 9 rotas; contraste das etapas do hero medido com as cores reais do palco animado;
+  - regressão de revelação: nenhum texto desfocado ou invisível e nenhum traço de diagrama sem desenhar, com e sem reduced motion;
+  - qualquer erro no console (inclusive divergência de hidratação) falha o teste.
+- CI roda o E2E depois do build e anexa o relatório quando falha.
+- 22 testes de unidade novos (53 no total) e 23 E2E (46 execuções entre desktop e mobile).
+
+### Alterado
+
+- Links do dicionário descrevem o destino (`{ to: "services" }`, `{ to: "home", hash: "faq" }`) em vez da URL; `resolveNavLinks` os converte.
+- Cartões da etapa 2 do hero vêm do conteúdo das linhas (fonte única) e linkam cada página de serviço.
+- `lastModified` saiu do sitemap: com `new Date()` ele mudava a cada build sem o conteúdo mudar.
+
+### Corrigido
+
+- **Títulos desfocados para sempre com reduced motion** (`BlurReveal`): o HTML do servidor sai com o estado inicial com blur (o servidor não conhece a preferência) e a variante reduzida não desfazia o `filter`. Mesmo problema no `SupplierDiagram`: com reduced motion as linhas do diagrama nunca apareciam (`pathLength` 0). As variantes reduzidas agora cobrem as mesmas propriedades; regra no `AGENTS.md` e teste E2E que falha com o bug (verificado reintroduzindo-o).
+- Link de idioma errado no HTML estático das páginas em inglês com URL traduzida: na pré-renderização o `usePathname()` devolve a pasta interna (`/en/servicos/...`), não a URL pública. `matchPath` reconhece as duas formas.
+
+### Medido nesta versão
+
+- JS inicial: home **208 KB gzip**; hub, serviço e time **204 KB** (meta D21: 220 KB).
+- Páginas de serviço: ~400 palavras cada (aceite da Fase 5 pede ≥ 600 — depende de conteúdo real, P13).
+
+### Problemas conhecidos
+
+- Copy provisória nas páginas novas: inclusos, prazos, FAQ e modelo de cobrança precisam de validação; não há faixa de preço (P12).
+- `/pt/cases` e prova técnica ainda não existem (Fase 5).
+- **O repositório no GitHub está público** — a decisão D20 pede privado por causa da licença do React Bits.
+- Continua valendo: medição do hero em aparelho real pendente; pôster SVG provisório.
+
 ## [0.2.0] - 2026-09-30
 
 Design system, efeitos do React Bits, home completa abaixo do hero e o hero com rótulos de vista explodida. Cobre boa parte das Fases 3, 4 e 5 do plano. **Toda a copy nova é provisória** (Fase 2; pendências P8–P11).

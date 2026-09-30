@@ -32,7 +32,13 @@ const fade: Variants = {
   shown: (i: number) => ({ opacity: 1, transition: { delay: 0.2 + i * 0.12, duration: 0.3 } }),
 };
 
-const still: Variants = { hidden: { opacity: 1 }, shown: { opacity: 1 } };
+// Mesmas propriedades de `draw`: o HTML do servidor sai com pathLength 0 (ele não
+// conhece a preferência de movimento) e a variante estática precisa desfazer isso.
+const still: Variants = {
+  hidden: { pathLength: 1, opacity: 1 },
+  shown: { pathLength: 1, opacity: 1 },
+};
+const stillMark: Variants = { hidden: { opacity: 1 }, shown: { opacity: 1 } };
 
 const VENDOR_X = [56, 180, 304] as const;
 const FRONT_X = [45, 135, 225, 315] as const;
@@ -79,7 +85,7 @@ export function SupplierDiagram({
 }) {
   const reduce = useReducedMotion();
   const line = reduce ? still : draw;
-  const mark = reduce ? still : fade;
+  const mark = reduce ? stillMark : fade;
 
   return (
     <m.svg
