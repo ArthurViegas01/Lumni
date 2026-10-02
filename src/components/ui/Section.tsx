@@ -3,21 +3,22 @@ import type { ReactNode } from "react";
 type SectionProps = {
   children: ReactNode;
   id?: string;
-  theme?: "light" | "dark";
-  /** Fundo `surface` em vez de `bg`, para alternar seções vizinhas do mesmo tema. */
+  /** `invert`: bloco de carbono com tinta de papel (inverte junto com o modo do site). */
+  tone?: "base" | "invert";
+  /** Fundo `surface` (concreto) em vez de `bg`, para alternar seções vizinhas do mesmo tom. */
   surface?: boolean;
   className?: string;
   "aria-labelledby"?: string;
 };
 
 /**
- * Seção de página: tema, espaçamento vertical padrão (80px mobile / 128px desktop)
+ * Seção de página: tom, espaçamento vertical padrão (80px mobile / 128px desktop)
  * e container. Todo bloco de página usa isto — não repita paddings à mão.
  */
 export function Section({
   children,
   id,
-  theme = "light",
+  tone = "base",
   surface = false,
   className = "",
   ...aria
@@ -25,7 +26,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={`theme-${theme} relative scroll-mt-16 overflow-hidden ${surface ? "bg-surface" : "bg-bg"} py-20 md:py-32 ${className}`}
+      className={`tone-${tone} relative scroll-mt-16 overflow-hidden ${surface ? "bg-surface" : "bg-bg"} py-20 md:py-32 ${className}`}
       {...aria}
     >
       <Container>{children}</Container>

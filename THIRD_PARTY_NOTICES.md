@@ -54,4 +54,4 @@ SOFTWARE.
 
 ## Fontes
 
-Source Serif 4, Inter e JetBrains Mono — SIL Open Font License 1.1. Licenças completas em `src/app/fonts/LICENSE-*.txt`.
+Inter e JetBrains Mono — SIL Open Font License 1.1 (Source Serif 4 saiu na v0.4.0). Licenças completas em `src/app/fonts/LICENSE-*.txt`.

@@ -53,11 +53,13 @@ Se não existir, crie no lugar certo da estrutura descrita no plano, não dentro
 
 ## Estilo visual (não genérico)
 
-- Cores **só** por token semântico: `bg-bg`, `bg-surface`, `text-ink`, `text-ink-quiet`, `border-border`, `bg-accent`, `text-accent-ink`. Nada de hex solto nem paleta padrão do Tailwind (`gray-500`, `blue-600`…) em componente.
-- Tema por seção com `theme-dark` / `theme-light`. Os tokens trocam sozinhos; o componente não muda.
-- Tipografia: `font-display` (serifa) só em título grande (`text-hero`, `text-h2`); corpo em sans; `font-mono` para rótulos e números.
+- **Monocromático puro** (decisão D26): papel e carbono, nada mais. Cores **só** por token semântico: `bg-bg`, `bg-surface` (concreto), `text-ink`, `text-ink-quiet`, `border-border` (traço cheio), `border-hairline` (divisória discreta). `accent` existe e hoje é a própria tinta. Nada de hex solto nem paleta padrão do Tailwind.
+- **Tom por bloco** com `tone-base` / `tone-invert` (ou `<Section tone="invert">`). `invert` é o bloco de carbono com tinta de papel. O modo do site (`data-theme` no `<html>`) troca papel e carbono e tudo inverte junto — **nunca** escreva cor fixa de modo claro ou escuro.
+- Modo de cor: `src/lib/theme.ts` (regra pura + script do `<head>`), `interactive/theme-store.ts` (`useTheme`, `setTheme`). Componente que precisa reagir ao modo assina `useTheme`; não crie outro estado.
+- Tipografia: uma família (Inter). Título grande = `display-caps` + `text-hero` / `text-h2` (peso 800, caixa alta, entreletra negativa — já no token). Corpo 400; `font-mono` para rótulos e números. Título novo tem de passar no `e2e/typography.spec.ts` (palavra mais longa cabendo na coluna).
 - Texto corrido com `max-w-measure` (68ch). Container com `max-w-site`. Gutter lateral de 16px no mobile (`px-4`).
-- Raios: `rounded-sm` (6px) e `rounded-lg` (14px). Nenhum outro.
+- **Canto vivo**: `rounded-sm`/`rounded-lg` valem 0. Nada de `rounded-full`, sombra desfocada ou blur de fundo; sombra, quando houver, é dura e deslocada (ver `.spotlight-card`).
+- Cena 3D: cores em `SCENE_PALETTE` (`scene/color.ts`), espelho dos tokens verificado por teste.
 
 ## Fronteiras cliente/servidor
 
@@ -69,7 +71,8 @@ Se não existir, crie no lugar certo da estrutura descrita no plano, não dentro
 
 - A coreografia é a função pura `cubeStateAt`. Mudou keyframe → rode e ajuste `cubeState.test.ts`.
 - Nada de `useState`/`setState` por frame: estado visual muda em `useFrame`, via refs.
-- `?freeze=1` desliga mola e balanço ocioso (render determinístico para screenshot).
+- `?freeze=1` desliga mola, balanço ocioso e giros de camada (render determinístico para screenshot).
+- **Giros de camada** (topo da página): cronograma puro em `scene/twist.ts`, testado. Ao fim de cada giro as peças voltam à origem — só funciona porque as 27 peças são idênticas. **Todo detalhe da peça (`scene/concrete.ts`, `CubePoster`) tem de ser simétrico por rotação de 90° e igual nas seis faces**; uma peça diferente das outras exigiria rastrear a permutação e reescrever os rótulos da etapa 3.
 
 ## Antes de dar a tarefa por encerrada
 

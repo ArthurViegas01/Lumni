@@ -12,6 +12,8 @@
     "label": "Main",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "themeToDark": "Switch to black background",
+    "themeToLight": "Switch to white background",
     "links": [
       {
         "label": "Services",

@@ -30,7 +30,7 @@ export function SectionHeading({
   return (
     <header className={`max-w-measure ${align === "center" ? "mx-auto text-center" : ""}`}>
       {eyebrow ? <Eyebrow text={eyebrow} scramble /> : null}
-      <BlurReveal id={id} text={title} className="font-display text-h2 text-ink" />
+      <BlurReveal id={id} text={title} className="display-caps text-h2 text-ink" />
       {lead ? (
         <Reveal>
           <p className="mt-4 text-lg text-ink-quiet">{lead}</p>
@@ -59,7 +59,7 @@ export function PageHero({
   back?: { label: string; href: string };
 }) {
   return (
-    <section className="theme-dark relative overflow-hidden bg-bg pt-36 pb-20 md:min-h-[72svh] md:pt-44 md:pb-28">
+    <section className="tone-base relative overflow-hidden border-b border-border bg-bg pt-36 pb-20 md:min-h-[72svh] md:pt-44 md:pb-28">
       <GridBackdrop />
       <Container>
         {back ? (
@@ -94,7 +94,7 @@ export function StepsList({
           <li key={step.name} className="relative pl-10">
             <span
               aria-hidden
-              className="absolute top-1.5 left-0 size-[15px] rounded-full border border-accent bg-bg"
+              className="absolute top-1.5 left-0 size-[15px] border border-accent bg-bg"
             />
             <Reveal index={i}>
               <p className="font-mono text-xs tracking-widest text-accent uppercase">
@@ -127,7 +127,7 @@ export function StepsSection({
   steps: readonly { name: string; duration: string; text: string }[];
 }) {
   return (
-    <Section id={id} theme="dark" aria-labelledby={headingId}>
+    <Section id={id} tone="invert" aria-labelledby={headingId}>
       <GridBackdrop />
       <div className="grid gap-12 md:grid-cols-[1fr_1.2fr] md:gap-20">
         <div className="md:sticky md:top-32 md:self-start">
@@ -172,7 +172,7 @@ export function CtaBand({
   href: string;
 }) {
   return (
-    <Section theme="dark" aria-labelledby="cta-titulo" className="text-center">
+    <Section tone="invert" aria-labelledby="cta-titulo" className="text-center">
       <GridBackdrop />
       <SectionHeading id="cta-titulo" title={title} lead={lead} align="center" />
       <div className="mt-10 flex justify-center">

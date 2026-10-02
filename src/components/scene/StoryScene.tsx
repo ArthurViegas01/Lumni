@@ -1,7 +1,6 @@
 "use client";
 
 import { useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import * as m from "motion/react-m";
 import dynamic from "next/dynamic";
 import {
   type ReactNode,
@@ -13,8 +12,6 @@ import {
 } from "react";
 import { SCROLL_SPRING } from "@/lib/motion";
 import { isFrozen, serverSnapshot, subscribeNever, supportsWebGL } from "./capabilities";
-import { SCENE_COLORS, mixHex } from "./color";
-import { backgroundLightnessOf, cubeStateAt } from "./cubeState";
 import { canonicalAnchors, measureAnchors, remapProgress } from "./progress";
 import type { CalloutElements } from "./types";
 
@@ -35,7 +32,8 @@ type StorySceneProps = {
 /**
  * Região do hero: um palco sticky (fundo + pôster + canvas + rótulos) com as etapas
  * de texto rolando por cima. O scroll vira um único número de 0 a 1 que alimenta o
- * cubo, a cor de fundo e os rótulos — a mesma fonte, então nunca dessincronizam.
+ * cubo e os rótulos — a mesma fonte, então nunca dessincronizam. O fundo é o papel
+ * do site: fixo, e inverte junto com o modo.
  */
 export function StoryScene({ children, poster, label, callouts = [] }: StorySceneProps) {
   const root = useRef<HTMLElement>(null);
@@ -72,18 +70,9 @@ export function StoryScene({ children, poster, label, callouts = [] }: StoryScen
     return () => observer.disconnect();
   }, [anchors]);
 
-  // Fundo escuro -> claro na etapa 3, guiado pelo mesmo parâmetro que troca o cubo para traço.
-  const background = useTransform(progress, (p) =>
-    mixHex(SCENE_COLORS.darkBg, SCENE_COLORS.lightBg, backgroundLightnessOf(cubeStateAt(p).edges)),
-  );
-
   return (
-    <section ref={root} aria-label={label} className="theme-dark relative">
-      <m.div
-        className="sticky top-0 h-svh overflow-hidden"
-        style={{ backgroundColor: background }}
-        aria-hidden
-      >
+    <section ref={root} aria-label={label} className="tone-base relative">
+      <div className="sticky top-0 h-svh overflow-hidden bg-bg" aria-hidden>
         <div
           className={`absolute inset-0 transition-opacity duration-700 ${
             showCanvas && canvasReady ? "opacity-0" : "opacity-100"
@@ -102,7 +91,7 @@ export function StoryScene({ children, poster, label, callouts = [] }: StoryScen
               />
             </div>
             {/* Rótulos da etapa 3: posicionados pelo Cube a cada frame, via refs. */}
-            <div className="theme-light pointer-events-none absolute inset-0 hidden md:block">
+            <div className="pointer-events-none absolute inset-0 hidden md:block">
               <svg className="absolute inset-0 size-full overflow-visible">
                 {callouts.map((text, i) => (
                   <polyline
@@ -111,7 +100,7 @@ export function StoryScene({ children, poster, label, callouts = [] }: StoryScen
                       calloutsRef.current.lines[i] = el;
                     }}
                     fill="none"
-                    className="stroke-ink-quiet"
+                    className="stroke-ink"
                     strokeWidth={1}
                     style={{ opacity: 0 }}
                   />
@@ -123,7 +112,7 @@ export function StoryScene({ children, poster, label, callouts = [] }: StoryScen
                   ref={(el) => {
                     calloutsRef.current.labels[i] = el;
                   }}
-                  className="absolute top-0 left-0 rounded-sm bg-bg/90 px-1.5 py-0.5 font-mono text-xs whitespace-nowrap text-ink will-change-transform"
+                  className="absolute top-0 left-0 border border-ink bg-bg px-1.5 py-0.5 font-mono text-xs whitespace-nowrap text-ink uppercase will-change-transform"
                   style={{ opacity: 0 }}
                 >
                   {text}
@@ -132,7 +121,7 @@ export function StoryScene({ children, poster, label, callouts = [] }: StoryScen
             </div>
           </>
         )}
-      </m.div>
+      </div>
       {/* Sobe o conteúdo por cima do palco sticky. */}
       <div ref={content} className="relative -mt-[100svh]">
         {children}

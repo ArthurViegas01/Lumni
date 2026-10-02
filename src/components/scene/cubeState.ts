@@ -121,14 +121,6 @@ export function solidOpacityOf(edges: number): number {
 }
 
 /**
- * Quanto o fundo já clareou (0 escuro, 1 claro) em função de `edges`. A virada
- * acontece no miolo da transição, então o fundo passa pouco tempo em cinza médio.
- */
-export function backgroundLightnessOf(edges: number): number {
-  return smooth(clamp01((edges - 0.25) / 0.5));
-}
-
-/**
  * Visibilidade dos rótulos da etapa 3 (0 a 1): só aparecem com o cubo quase todo
  * explodido e já em traço, e somem antes de ele remontar.
  */

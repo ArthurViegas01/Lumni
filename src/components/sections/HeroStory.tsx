@@ -17,12 +17,10 @@ type Side = "left" | "right";
 /** Uma etapa: 100svh (ou mais, se o texto pedir), texto numa metade, a outra livre para o cubo. */
 function Stage({
   side,
-  theme = "dark",
   narrow = false,
   children,
 }: {
   side: Side;
-  theme?: "dark" | "light";
   /** Coluna de texto mais estreita, para dar espaço ao cubo explodido e aos rótulos. */
   narrow?: boolean;
   children: ReactNode;
@@ -30,14 +28,14 @@ function Stage({
   return (
     <div
       data-stage
-      className={`${theme === "light" ? "theme-light" : "theme-dark"} flex min-h-svh items-end px-4 pt-24 pb-16 md:items-center md:px-8 md:py-24`}
+      className={`flex min-h-svh items-end px-4 pt-24 pb-16 md:items-center md:px-8 md:py-24`}
     >
       <div
         className={`mx-auto flex w-full max-w-site ${side === "right" ? "md:justify-end" : "md:justify-start"}`}
       >
         {/* No mobile o cubo pode passar por trás do texto: um painel garante a leitura. */}
         <div
-          className={`w-full rounded-lg bg-bg/85 p-5 backdrop-blur-sm md:bg-transparent md:p-0 md:backdrop-blur-none ${narrow ? "md:w-[30%]" : "md:w-[44%]"}`}
+          className={`w-full border border-ink bg-bg/90 p-5 md:border-0 md:bg-transparent md:p-0 ${narrow ? "md:w-[30%]" : "md:w-[44%]"}`}
         >
           {children}
         </div>
@@ -93,7 +91,7 @@ export function HeroStory({
         </ul>
       </Stage>
 
-      <Stage side="left" theme="light" narrow>
+      <Stage side="left" narrow>
         <Heading id="especialidades" className="scroll-mt-24">
           {team.title}
         </Heading>

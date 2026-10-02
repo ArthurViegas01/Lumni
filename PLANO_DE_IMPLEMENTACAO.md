@@ -1,7 +1,7 @@
 # Plano de implementação — site Lumni
 
-> **Versão do plano:** 1.2 · **Atualizado em:** 30/09/2026 · **Versão do código:** 0.3.0
-> **Onde estamos:** Fases 0 e 1 com código pronto; Fase 3 quase fechada (falta o Figma); home, hero, páginas de serviço, hub e time no ar; rotas traduzidas (parte da Fase 8) e E2E com Playwright entregues na v0.3.0. Detalhe por item na seção 5.
+> **Versão do plano:** 1.4 · **Atualizado em:** 30/09/2026 · **Versão do código:** 0.5.0
+> **Onde estamos:** v0.5.0 dá ao cubo peças de concreto detalhadas e giros de camada no topo; v0.4.0 troca a direção de arte para **brutalismo monocromático** (D26) com modo invertido. Home, hero, páginas de serviço, hub e time no ar; rotas traduzidas e E2E com Playwright desde a v0.3.0. Detalhe por item na seção 5.
 > **Próxima ação:** tornar o repositório privado (D20); validar a copy das páginas de serviço e decidir a faixa de preço (P10, P12, P13); medir o hero num Android intermediário (roteiro 4.2).
 
 Este documento é a fonte da verdade técnica do site. Ele diz **o que** construir, **como**, **em que ordem** e **como saber que está pronto**. Decisões de negócio e posicionamento vivem no documento de planejamento; aqui ficam só as que afetam código.
@@ -26,33 +26,38 @@ Regra de manutenção: toda decisão nova entra na tabela da seção 1; toda ent
 
 ## 1. Decisões registradas
 
-| #   | Decisão                 | Escolha                                                                                                                                  | Por quê                                                                                                                                                                                          | Data  |
-| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----- |
-| D1  | Nome                    | **Lumni como provisório**                                                                                                                | Foco no site; o naming volta depois. Trocar o nome é mexer em poucos arquivos (seção 3.12)                                                                                                       | 29/09 |
-| D2  | Direção de arte         | **Híbrida:** base clara institucional + seções escuras técnicas                                                                          | Base clara passa solidez para quem compra contrato recorrente; seções escuras provam profundidade técnica. Tokens únicos, tema por seção                                                         | 30/09 |
-| D3  | Tamanho do time na copy | **Não mencionar número de pessoas**                                                                                                      | Decisão de negócio. A prova vem das especialidades, não da contagem                                                                                                                              | 30/09 |
-| D4  | Framework               | **Next.js 16 (App Router)**                                                                                                              | i18n com slugs traduzidos, SSG, ecossistema React do time, reuso de componentes em projetos de cliente                                                                                           | 26/09 |
-| D5  | Hero                    | **Cubo 3D de 27 peças guiado por scroll**, inspirado na técnica do animejs.com                                                           | Peças separadas permitem abrir, explodir e remontar; a narrativa "especialidades viram um só contrato"                                                                                           | 29/09 |
-| D6  | Render 3D               | **React Three Fiber + three.js, geometria gerada por código**                                                                            | Sem arquivo de modelo nem Draco: o animejs.com gasta ~800 KB só nisso. CSS 3D quebra com peças se cruzando no Safari                                                                             | 29/09 |
-| D7  | Animação 3D             | **Motion fornece o progresso; função pura `cubeStateAt` calcula o estado; `useFrame` aplica**                                            | A integração oficial do Motion com R3F foi descontinuada. Função pura = scroll reversível e coreografia testável                                                                                 | 29/09 |
-| D8  | Plano B de animação     | **GSAP**, só se a coreografia passar de ~8 parâmetros                                                                                    | Gratuito desde 2025, licença permite site de cliente. Duas libs desde o início = dois modelos mentais                                                                                            | 29/09 |
-| D9  | Idiomas                 | **pt e en, prefixo obrigatório** (`/pt`, `/en`), negociação por `Accept-Language` no `proxy.ts`                                          | Prefixo só no inglês obriga reescrever o roteamento depois                                                                                                                                       | 26/09 |
-| D10 | 404                     | **`global-not-found.tsx`** (experimental no Next 16)                                                                                     | O layout raiz vive em `[locale]`; é o caso exato para o qual o recurso existe                                                                                                                    | 30/09 |
-| D11 | Fontes                  | **woff2 no repo via `next/font/local`**                                                                                                  | Build independente do Google (o sandbox de CI pode bloquear), zero requisição a terceiros (LGPD)                                                                                                 | 30/09 |
-| D12 | Testes                  | **Vitest** (unidade) agora; **Playwright** (visual, e2e, a11y) na Fase 4                                                                 | Vitest 5 exige Node ≥ 22.12 — fixado em `.nvmrc` e `engines`                                                                                                                                     | 30/09 |
-| D13 | Blog                    | **MDX no repositório** (`@next/mdx`), CMS só quando alguém sem git precisar publicar                                                     | Custo zero, versionado, quem escreve é técnico                                                                                                                                                   | 26/09 |
-| D14 | Hospedagem              | **Vercel** para o site; domínio no registro.br; DNS no Cloudflare                                                                        | Preview por PR, sem servidor para manter                                                                                                                                                         | 26/09 |
-| D15 | Analytics               | **Sem cookie de rastreio** (Plausible, Umami ou Vercel Analytics)                                                                        | Dispensa banner de cookies: melhor conversão e conformidade                                                                                                                                      | 26/09 |
-| D16 | Componentes de efeito   | **React Bits como fonte primária**, só componentes que usam `motion` ou nenhuma lib; portados e endurecidos antes de entrar              | Estética de ponta sem dependência nova. O original faz `setState` a cada movimento de mouse e usa cores fixas; a versão portada usa variável CSS ou motion value, tokens, `m.*` e reduced motion | 30/09 |
-| D17 | Motion+                 | **Não usar** (AnimateNumber, Ticker, ScrambleText etc. são pagos)                                                                        | Os equivalentes gratuitos do React Bits cobrem o que o site precisa. Reavaliar se alguém comprar a licença                                                                                       | 30/09 |
-| D18 | anime.js                | **Não entra como dependência**; as técnicas do animejs.com (traço de SVG, rótulos de vista explodida, stagger, scroll) feitas com Motion | Seria o terceiro motor (Motion e R3F já existem) para efeitos que o Motion já faz                                                                                                                | 30/09 |
-| D19 | Efeitos contínuos       | **Fora:** canvas em loop, cursor customizado, partículas, fundos WebGL extras                                                            | Custo constante de bateria e GPU e cara de template em site B2B. Fundo técnico em CSS (`GridBackdrop`), custo zero parado                                                                        | 30/09 |
-| D20 | Licença do React Bits   | **Uso permitido no site; repo privado recomendado**                                                                                      | MIT + Commons Clause: pode usar como parte do site, não pode redistribuir os componentes em si. Registro em `THIRD_PARTY_NOTICES.md`                                                             | 30/09 |
-| D21 | Orçamento de JS         | **Meta revista para ≤ 220 KB gzip** (antes 200)                                                                                          | Medido: o framework Next/React sozinho ocupa ~177 KB; 200 KB deixaria 23 KB para o site inteiro. A meta agora separa framework e código nosso                                                    | 30/09 |
-| D22 | Motion e three          | **Manter `useFrame` + função pura**; não usar o `threeEffect` (`motion/three`) que o Motion 13 publicou                                  | O `threeEffect` escreve a cada frame no loop do Motion e brigaria com o `frameloop="demand"` do R3F, que é o que zera o custo parado                                                             | 30/09 |
-| D23 | URLs traduzidas         | **`rewrites` + `redirects` no `next.config.ts`**, gerados de `i18n/routes.ts`; o `proxy.ts` só negocia o idioma                          | No Next 16 a ordem é redirects → proxy → rewrites `beforeFiles` → arquivos: a config resolve sem código em runtime, é testável como dado e o proxy fica trivial                                  | 30/09 |
-| D24 | E2E                     | **Playwright contra `next start`**, desktop + mobile, `reducedMotion: "reduce"` por padrão; antecipado para a v0.3.0                     | Proxy, rewrites e redirects só se comportam como em produção no build; movimento reduzido deixa o teste determinístico (um spec cobre os dois modos)                                             | 30/09 |
-| D25 | Ordem das fases         | **Registro de rotas e slugs em inglês (Fase 8) adiantados para a v0.3.0**                                                                | As páginas de serviço precisavam de links; escrever URLs à mão para migrar depois custaria mais                                                                                                  | 30/09 |
+| #   | Decisão                 | Escolha                                                                                                                                                                                | Por quê                                                                                                                                                                                                             | Data  |
+| --- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| D1  | Nome                    | **Lumni como provisório**                                                                                                                                                              | Foco no site; o naming volta depois. Trocar o nome é mexer em poucos arquivos (seção 3.12)                                                                                                                          | 29/09 |
+| D2  | Direção de arte         | ~~Híbrida (base clara + seções escuras)~~ → **substituída por D26 em 01/10**                                                                                                           | Ver D26                                                                                                                                                                                                             | 29/09 |
+| D3  | Tamanho do time na copy | **Não mencionar número de pessoas**                                                                                                                                                    | Decisão de negócio. A prova vem das especialidades, não da contagem                                                                                                                                                 | 30/09 |
+| D4  | Framework               | **Next.js 16 (App Router)**                                                                                                                                                            | i18n com slugs traduzidos, SSG, ecossistema React do time, reuso de componentes em projetos de cliente                                                                                                              | 26/09 |
+| D5  | Hero                    | **Cubo 3D de 27 peças guiado por scroll**, inspirado na técnica do animejs.com                                                                                                         | Peças separadas permitem abrir, explodir e remontar; a narrativa "especialidades viram um só contrato"                                                                                                              | 29/09 |
+| D6  | Render 3D               | **React Three Fiber + three.js, geometria gerada por código**                                                                                                                          | Sem arquivo de modelo nem Draco: o animejs.com gasta ~800 KB só nisso. CSS 3D quebra com peças se cruzando no Safari                                                                                                | 29/09 |
+| D7  | Animação 3D             | **Motion fornece o progresso; função pura `cubeStateAt` calcula o estado; `useFrame` aplica**                                                                                          | A integração oficial do Motion com R3F foi descontinuada. Função pura = scroll reversível e coreografia testável                                                                                                    | 29/09 |
+| D8  | Plano B de animação     | **GSAP**, só se a coreografia passar de ~8 parâmetros                                                                                                                                  | Gratuito desde 2025, licença permite site de cliente. Duas libs desde o início = dois modelos mentais                                                                                                               | 29/09 |
+| D9  | Idiomas                 | **pt e en, prefixo obrigatório** (`/pt`, `/en`), negociação por `Accept-Language` no `proxy.ts`                                                                                        | Prefixo só no inglês obriga reescrever o roteamento depois                                                                                                                                                          | 26/09 |
+| D10 | 404                     | **`global-not-found.tsx`** (experimental no Next 16)                                                                                                                                   | O layout raiz vive em `[locale]`; é o caso exato para o qual o recurso existe                                                                                                                                       | 30/09 |
+| D11 | Fontes                  | **woff2 no repo via `next/font/local`**                                                                                                                                                | Build independente do Google (o sandbox de CI pode bloquear), zero requisição a terceiros (LGPD)                                                                                                                    | 30/09 |
+| D12 | Testes                  | **Vitest** (unidade) agora; **Playwright** (visual, e2e, a11y) na Fase 4                                                                                                               | Vitest 5 exige Node ≥ 22.12 — fixado em `.nvmrc` e `engines`                                                                                                                                                        | 30/09 |
+| D13 | Blog                    | **MDX no repositório** (`@next/mdx`), CMS só quando alguém sem git precisar publicar                                                                                                   | Custo zero, versionado, quem escreve é técnico                                                                                                                                                                      | 26/09 |
+| D14 | Hospedagem              | **Vercel** para o site; domínio no registro.br; DNS no Cloudflare                                                                                                                      | Preview por PR, sem servidor para manter                                                                                                                                                                            | 26/09 |
+| D15 | Analytics               | **Sem cookie de rastreio** (Plausible, Umami ou Vercel Analytics)                                                                                                                      | Dispensa banner de cookies: melhor conversão e conformidade                                                                                                                                                         | 26/09 |
+| D16 | Componentes de efeito   | **React Bits como fonte primária**, só componentes que usam `motion` ou nenhuma lib; portados e endurecidos antes de entrar                                                            | Estética de ponta sem dependência nova. O original faz `setState` a cada movimento de mouse e usa cores fixas; a versão portada usa variável CSS ou motion value, tokens, `m.*` e reduced motion                    | 30/09 |
+| D17 | Motion+                 | **Não usar** (AnimateNumber, Ticker, ScrambleText etc. são pagos)                                                                                                                      | Os equivalentes gratuitos do React Bits cobrem o que o site precisa. Reavaliar se alguém comprar a licença                                                                                                          | 30/09 |
+| D18 | anime.js                | **Não entra como dependência**; as técnicas do animejs.com (traço de SVG, rótulos de vista explodida, stagger, scroll) feitas com Motion                                               | Seria o terceiro motor (Motion e R3F já existem) para efeitos que o Motion já faz                                                                                                                                   | 30/09 |
+| D19 | Efeitos contínuos       | **Fora:** canvas em loop, cursor customizado, partículas, fundos WebGL extras                                                                                                          | Custo constante de bateria e GPU e cara de template em site B2B. Fundo técnico em CSS (`GridBackdrop`), custo zero parado                                                                                           | 30/09 |
+| D20 | Licença do React Bits   | **Uso permitido no site; repo privado recomendado**                                                                                                                                    | MIT + Commons Clause: pode usar como parte do site, não pode redistribuir os componentes em si. Registro em `THIRD_PARTY_NOTICES.md`                                                                                | 30/09 |
+| D21 | Orçamento de JS         | **Meta revista para ≤ 220 KB gzip** (antes 200)                                                                                                                                        | Medido: o framework Next/React sozinho ocupa ~177 KB; 200 KB deixaria 23 KB para o site inteiro. A meta agora separa framework e código nosso                                                                       | 30/09 |
+| D22 | Motion e three          | **Manter `useFrame` + função pura**; não usar o `threeEffect` (`motion/three`) que o Motion 13 publicou                                                                                | O `threeEffect` escreve a cada frame no loop do Motion e brigaria com o `frameloop="demand"` do R3F, que é o que zera o custo parado                                                                                | 30/09 |
+| D23 | URLs traduzidas         | **`rewrites` + `redirects` no `next.config.ts`**, gerados de `i18n/routes.ts`; o `proxy.ts` só negocia o idioma                                                                        | No Next 16 a ordem é redirects → proxy → rewrites `beforeFiles` → arquivos: a config resolve sem código em runtime, é testável como dado e o proxy fica trivial                                                     | 30/09 |
+| D24 | E2E                     | **Playwright contra `next start`**, desktop + mobile, `reducedMotion: "reduce"` por padrão; antecipado para a v0.3.0                                                                   | Proxy, rewrites e redirects só se comportam como em produção no build; movimento reduzido deixa o teste determinístico (um spec cobre os dois modos)                                                                | 30/09 |
+| D25 | Ordem das fases         | **Registro de rotas e slugs em inglês (Fase 8) adiantados para a v0.3.0**                                                                                                              | As páginas de serviço precisavam de links; escrever URLs à mão para migrar depois custaria mais                                                                                                                     | 30/09 |
+| D26 | Direção de arte         | **Brutalismo monocromático:** papel branco, tinta preta, cubo preto; grotesca pesada em caixa alta; canto vivo; sem fotos; blocos invertidos (carbono) para ritmo                      | Pedido do Arthur (referência: arquitetura brutalista em P&B). Monocromático puro: CTA e foco viram blocos sólidos de tinta. Sem fotos: o concreto é o próprio layout (grade, traço, bloco) e não depende de licença | 01/10 |
+| D27 | Modo invertido          | **Botão na barra troca papel e carbono; sem escolha salva, segue o sistema.** Script síncrono no `<head>` aplica `data-theme` antes do paint; CSS cai no `prefers-color-scheme` sem JS | Pedido do Arthur. Dois primitivos (`--paper`/`--carbon`) trocados no `:root` invertem o site inteiro, inclusive os blocos já invertidos, sem um componente sequer saber do modo                                     | 01/10 |
+| D28 | Tipografia              | **Uma família (Inter variável) em 400/800**; Source Serif 4 removida                                                                                                                   | A grotesca pesada pedida já estava no repo; sai um woff2 de 50 KB (fontes: 139 → 95 KB)                                                                                                                             | 01/10 |
+| D29 | Giros de camada         | **Giros de cubo mágico só no topo da página** (um de 0,6 s, pausa de 0,45 s), terminam o giro em andamento ao rolar; desligados com reduced motion e `?freeze=1`                       | Pedido do Arthur. É a única exceção à D19: limitada à primeira tela, sem custo depois de rolar, e o `frameloop="demand"` continua — fora dos giros, nenhum frame                                                    | 01/10 |
+| D30 | Peça do cubo            | **Módulo de fachada brutalista:** chanfro reto, caixilho recuado, tirante central e granulação, em texturas de canvas geradas no cliente (albedo + relevo)                             | Pedido do Arthur ("mais detalhado"). Canvas em vez de imagem: zero bytes no bundle e o mesmo desenho serve ao cubo preto e ao branco. O desenho é simétrico por 90°, requisito da D29                               | 01/10 |
 
 ---
 
@@ -227,39 +232,41 @@ A região tem 4 etapas de 100svh. Com o offset usado, o texto da etapa _i_ fica 
 - **Inclinação pelo ponteiro:** ±5°, amortecida, só com ponteiro fino e fora do `?freeze=1`. Pede frames só enquanto converge.
 - **Título do hero entrando palavra por palavra em CSS**, rótulo decifrando (`Scramble`), cartões com luz no hover e borda com brilho na frente prioritária, CTA magnético.
 
+#### Entregue na v0.5.0 (D29, D30)
+
+- **Giros de camada no topo** (`twist.ts`, puro e testado): sorteio determinístico (semente fixa), nunca dois giros seguidos no mesmo eixo, ângulo com aceleração e freio. Ao terminar cada giro a camada volta à origem; como as peças são idênticas, nada salta. Ao rolar, o giro atual termina e nenhum outro começa.
+- **Peças de concreto:** chanfro reto (RoundedBox com 1 segmento), caixilho recuado com sulco, tirante central e granulação, por textura de canvas (albedo + bump). Pôster SVG com o mesmo desenho, para o crossfade não saltar.
+
 #### O que falta para produção (Fase 4)
 
 Pôsteres AVIF exportados da cena, curvas de transição (fundo cinza no meio do caminho), material toon vs standard, cores do cubo (P2), testes visuais no CI. Detalhe na seção 5.
 
-### 3.6 Sistema de design
+### 3.6 Sistema de design (✅ v0.4.0 — D26, D27, D28)
 
-**Tokens semânticos** (`globals.css`). Os componentes só usam estes nomes; o tema da seção troca os valores.
+**Dois níveis de token** (`globals.css`):
 
-| Token          | Claro (`:root`, `.theme-light`) | Escuro (`.theme-dark`) | Utilitário                 |
-| -------------- | ------------------------------- | ---------------------- | -------------------------- |
-| `--bg`         | #ffffff                         | #0b0f14                | `bg-bg`                    |
-| `--surface`    | #f6f7f9                         | #131a22                | `bg-surface`               |
-| `--border`     | #e3e7ec                         | #1f2a35                | `border-border`            |
-| `--ink`        | #0f1419                         | #e6edf3                | `text-ink`                 |
-| `--ink-quiet`  | #5a6672                         | #9aa7b4                | `text-ink-quiet`           |
-| `--accent`     | #0f5c4a                         | #5b9cff                | `bg-accent`, `text-accent` |
-| `--accent-ink` | #ffffff                         | #0b0f14                | `text-accent-ink`          |
+1. **Primitivos** `--paper` e `--carbon`. Modo claro: papel `#ffffff`, carbono `#0a0a0a`. Modo invertido (`data-theme="dark"`, ou sistema escuro sem escolha salva): os dois trocam (`#0a0a0a` / `#f2f2f0`).
+2. **Semânticos por tom.** `.tone-base` (e o `:root`): fundo papel, tinta carbono. `.tone-invert`: o contrário. Os derivados são recalculados em cada elemento de tom:
 
-**Contraste verificado (WCAG 2.2):** todos os pares de texto passam AA; a maioria passa AAA.
+| Token         | Fórmula                         | Claro   | Invertido | Utilitário        |
+| ------------- | ------------------------------- | ------- | --------- | ----------------- |
+| `--bg`        | papel (base) / carbono (invert) | #ffffff | #0a0a0a   | `bg-bg`           |
+| `--ink`       | o oposto de `--bg`              | #0a0a0a | #f2f2f0   | `text-ink`        |
+| `--surface`   | 5% de tinta sobre o fundo       | #f1f1f1 | #131313   | `bg-surface`      |
+| `--ink-quiet` | 68% de tinta                    | #4d4d4d | #9e9e9d   | `text-ink-quiet`  |
+| `--border`    | a própria tinta (traço cheio)   | #0a0a0a | #f2f2f0   | `border-border`   |
+| `--hairline`  | 16% de tinta (divisória)        | #d2d2d2 | #282827   | `border-hairline` |
+| `--accent`    | = tinta (sinal monocromático)   | —       | —         | `bg-accent`       |
 
-| Par                     | Claro  | Escuro |
-| ----------------------- | ------ | ------ |
-| ink sobre bg            | 18,5:1 | 16,3:1 |
-| ink-quiet sobre bg      | 5,9:1  | 7,8:1  |
-| ink-quiet sobre surface | 5,5:1  | 7,1:1  |
-| accent sobre bg         | 7,9:1  | 7,0:1  |
-| accent-ink sobre accent | 7,9:1  | 7,0:1  |
+**Contraste medido no navegador (WCAG 2.2):** ink/bg 19,8:1 (claro) e 17,7:1 (invertido); ink-quiet/bg 8,5:1 e 7,4:1; ink-quiet/surface 7,5:1 e 6,9:1 — tudo AAA. O axe roda nos dois modos no E2E.
 
-**Tipografia:** `font-display` (Source Serif 4) só em `text-hero` (clamp 2.5–4.25rem) e `text-h2` (clamp 1.75–2.5rem). Corpo em Inter 16px. `font-mono` (JetBrains Mono) em rótulos, eyebrows e números.
+**Tipografia:** Inter variável. Títulos `display-caps` + `text-hero` (clamp 2–3,5rem) ou `text-h2` (clamp 1,625–2,5rem): peso 800, caixa alta, entreletra −0,035/−0,03em, entrelinha 1,04/1,06 (abaixo disso o til de "AUTOMAÇÃO" encosta na linha de cima). O teto do tamanho é a palavra mais longa da copy caber na coluna — `e2e/typography.spec.ts` mede. Corpo 16px peso 400; rótulos em JetBrains Mono caixa alta.
 
-**Layout:** container `max-w-site` (1200px), texto `max-w-measure` (68ch), gutter `px-4` no mobile e `px-8` no desktop, espaço vertical entre seções de 128px no desktop e 80px no mobile, raios `rounded-sm` (6px) e `rounded-lg` (14px).
+**Forma:** canto vivo (raios = 0), traço de 1px na cor da tinta, nenhuma sombra desfocada nem blur de fundo. Hover dos cartões: o bloco desloca 4px e deixa uma sombra dura (sem deslocamento com reduced motion). Botões: bloco de tinta (primário) ou contorno (secundário), em caixa alta.
 
-**Onde vai cada tema na home:** hero (etapas 1, 2 e 4) escuro; etapa 3 clara; "como trabalhamos" e prova técnica escuras; FAQ, contato e rodapé de conteúdo claros; footer escuro.
+**Ritmo da home:** header, hero, problema e FAQ em papel (FAQ em concreto); "como trabalhamos", faixa de tecnologias, contato e rodapé em carbono. Nas páginas internas: hero de página em papel com grade, etapas e chamada final em carbono.
+
+**Cubo:** albedo carvão `#303030` no claro e branco no invertido, sem tone mapping (`flat`) para a cor ser a do token, luz dura de cima com intensidade por modo; frestas na cor do papel; na etapa 3 a planta técnica é desenhada na tinta. Paleta em `scene/color.ts`, espelho dos tokens verificado por teste.
 
 ### 3.7 Sistema de movimento
 
@@ -406,7 +413,7 @@ Medido na v0.1.0 com `gzip -9` sobre os arquivos do build (a Vercel serve Brotli
 
 - Canvas e pôster `aria-hidden`: são decorativos; todo conteúdo está no DOM.
 - Link "pular para o conteúdo" no header (✅).
-- Foco visível com `--accent` (✅); nenhum `outline: none` sem substituto.
+- Foco visível: contorno de 2px na cor da tinta, nos dois modos (✅); nenhum `outline: none` sem substituto.
 - `prefers-reduced-motion` respeitado no hero e nos reveals (✅).
 - Contraste AA em todos os pares (✅, seção 3.6). Texto nunca sobre o cubo em movimento no desktop (layout em metades).
 - Formulário: `label` visível por campo, erro associado por `aria-describedby`, foco no primeiro erro.
@@ -450,7 +457,7 @@ Legenda: ✅ feito · 🟡 em andamento · ⬜ não iniciado. Estimativas em hor
 ### Fase 0 · Fundação ✅ (v0.1.0)
 
 - [x] Next 16 + TS estrito + Tailwind 4 a partir do `create-next-app` oficial
-- [x] Tokens da direção híbrida, temas por seção, escala tipográfica
+- [x] Tokens da direção híbrida, temas por seção, escala tipográfica (v0.2.0; substituídos pelo sistema brutalista na v0.4.0)
 - [x] Fontes auto-hospedadas com licença
 - [x] i18n pt/en com `proxy.ts`, `[locale]`, dicionários tipados e testados
 - [x] `global-not-found`, `robots`, `sitemap` com hreflang, ícone provisório
@@ -499,7 +506,7 @@ Legenda: ✅ feito · 🟡 em andamento · ⬜ não iniciado. Estimativas em hor
 - [ ] Footer completo: links, contato, encarregado LGPD, CNPJ
 - [x] **Redução de JS inicial:** `MotionProvider` com `LazyMotion` estrito, features carregadas depois, `m.*` em tudo. 224 → 213 KB
 - [ ] Barra de progresso de leitura
-- [ ] `Heading` como componente (hoje `font-display text-h2 text-ink` se repete em vários lugares)
+- [x] `Heading` como componente (v0.3.0); modo invertido com botão na barra (v0.4.0)
 
 **Aceite:** telas aprovadas; nenhuma cor fora dos tokens (`git grep` por `#` e por paleta padrão do Tailwind em `src/components` só retorna a cena 3D e o pôster); JS inicial ≤ 220 KB gzip (✅ 213).
 **Responsável sugerido:** designer (Figma) + dev (o que falta).
@@ -625,21 +632,22 @@ Total estimado da v1.0: **~330 horas**. Três trilhas em paralelo depois da Fase
 
 ## 8. Pendências e perguntas abertas
 
-| #   | Pergunta                                                                                                   | Bloqueia    | Padrão se ninguém decidir             |
-| --- | ---------------------------------------------------------------------------------------------------------- | ----------- | ------------------------------------- |
-| P1  | No 2º quadro do rascunho, o cubo deve girar uma camada (movimento de cubo mágico) além de mostrar a grade? | Fase 4      | Só a grade, sem giro de camada        |
-| P2  | Cor do cubo: grafite com o destaque da marca, ou uma cor por linha de serviço na etapa 2?                  | Fase 4      | Grafite + destaque                    |
-| P3  | Etapa 4 (remontar no CTA) fica?                                                                            | Fase 4      | Fica                                  |
-| P4  | Provedor de e-mail (Resend ou Brevo) e banco (Neon ou Supabase)                                            | Fase 6      | Resend + Neon                         |
-| P5  | WhatsApp como canal alternativo de contato?                                                                | Fase 6      | Sim, link com mensagem pré-preenchida |
-| P6  | Ticket mínimo aceito (filtra o formulário e a copy de preço)                                               | Fases 2 e 6 | — precisa de resposta                 |
-| P7  | Nome definitivo e domínio                                                                                  | Fase 10     | Lançar como Lumni                     |
-| P8  | Quais números reais a empresa pode publicar (anos somados, projetos entregues, SLA)?                       | Fase 5      | Sem seção de números                  |
-| P9  | A faixa de tecnologias bate com o que o time realmente usa?                                                | Fase 2      | Lista provisória da v0.2.0            |
-| P10 | Prazos do "como trabalhamos" e respostas do FAQ (contrato, SLA, saída) valem como estão?                   | Fase 2      | Texto provisório da v0.2.0            |
-| P11 | E-mail ou WhatsApp de contato para a chamada final enquanto o formulário não existe?                       | Fase 6      | Sem botão na chamada final            |
-| P12 | Publicar faixa de preço por frente ou só o modelo de cobrança?                                             | Fase 5      | Só o modelo de cobrança               |
-| P13 | Inclusos, prazos, exclusões e FAQ de cada frente valem? Há casos reais para a "prova"?                     | Fase 5      | Texto provisório, sem prova           |
+| #   | Pergunta                                                                                                     | Bloqueia    | Padrão se ninguém decidir             |
+| --- | ------------------------------------------------------------------------------------------------------------ | ----------- | ------------------------------------- |
+| P1  | No 2º quadro do rascunho, o cubo deve girar uma camada (movimento de cubo mágico) além de mostrar a grade?   | Fase 4      | Só a grade, sem giro de camada        |
+| P2  | Cor do cubo: grafite com o destaque da marca, ou uma cor por linha de serviço na etapa 2?                    | Fase 4      | Grafite + destaque                    |
+| P3  | Etapa 4 (remontar no CTA) fica?                                                                              | Fase 4      | Fica                                  |
+| P4  | Provedor de e-mail (Resend ou Brevo) e banco (Neon ou Supabase)                                              | Fase 6      | Resend + Neon                         |
+| P5  | WhatsApp como canal alternativo de contato?                                                                  | Fase 6      | Sim, link com mensagem pré-preenchida |
+| P6  | Ticket mínimo aceito (filtra o formulário e a copy de preço)                                                 | Fases 2 e 6 | — precisa de resposta                 |
+| P7  | Nome definitivo e domínio                                                                                    | Fase 10     | Lançar como Lumni                     |
+| P8  | Quais números reais a empresa pode publicar (anos somados, projetos entregues, SLA)?                         | Fase 5      | Sem seção de números                  |
+| P9  | A faixa de tecnologias bate com o que o time realmente usa?                                                  | Fase 2      | Lista provisória da v0.2.0            |
+| P10 | Prazos do "como trabalhamos" e respostas do FAQ (contrato, SLA, saída) valem como estão?                     | Fase 2      | Texto provisório da v0.2.0            |
+| P11 | E-mail ou WhatsApp de contato para a chamada final enquanto o formulário não existe?                         | Fase 6      | Sem botão na chamada final            |
+| P12 | Publicar faixa de preço por frente ou só o modelo de cobrança?                                               | Fase 5      | Só o modelo de cobrança               |
+| P13 | Inclusos, prazos, exclusões e FAQ de cada frente valem? Há casos reais para a "prova"?                       | Fase 5      | Texto provisório, sem prova           |
+| P14 | ~~O cubo deve ganhar textura de concreto?~~ **Respondida em 01/10: sim, módulo de fachada brutalista (D30)** | —           | —                                     |
 
 ---
 

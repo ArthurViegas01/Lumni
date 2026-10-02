@@ -1,54 +1,93 @@
 @import "tailwindcss";
 
 /*
- * Direção de arte híbrida: base clara e institucional (B), com seções escuras
- * e técnicas (A). Os tokens semânticos são os mesmos nos dois temas; a classe
- * .theme-dark numa seção troca os valores, e os componentes não mudam.
+ * Direção de arte brutalista monocromática (decisão D26): papel e carbono, nada mais.
+ *
+ * Dois níveis de token:
+ * 1. Primitivos `--paper` e `--carbon`. O modo invertido (data-theme="dark", ou o
+ *    sistema em modo escuro sem escolha salva) troca os dois, e o site inteiro inverte.
+ * 2. Semânticos (`--bg`, `--ink`, ...), derivados por tom. `.tone-base` é papel com
+ *    tinta de carbono; `.tone-invert` é o bloco de carbono com tinta de papel. Os
+ *    derivados são recalculados em cada elemento de tom (variável com var() resolve
+ *    onde é declarada, então declarar só no :root não bastaria).
+ *
+ * `--accent` continua existindo como "cor de sinal" e hoje é a própria tinta: se um
+ * dia entrar uma cor, muda aqui e nenhum componente muda.
  */
-:root,
-.theme-light {
-  --bg: #ffffff;
-  --surface: #f6f7f9;
-  --border: #e3e7ec;
-  --ink: #0f1419;
-  --ink-quiet: #5a6672;
-  --accent: #0f5c4a;
-  --accent-ink: #ffffff;
+:root {
+  --paper: #ffffff;
+  --carbon: #0a0a0a;
   color-scheme: light;
 }
 
-.theme-dark {
-  --bg: #0b0f14;
-  --surface: #131a22;
-  --border: #1f2a35;
-  --ink: #e6edf3;
-  --ink-quiet: #9aa7b4;
-  --accent: #5b9cff;
-  --accent-ink: #0b0f14;
+:root[data-theme="dark"] {
+  --paper: #0a0a0a;
+  --carbon: #f2f2f0;
   color-scheme: dark;
+}
+
+/* Sem JavaScript (o script do <head> não rodou): segue o sistema. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --paper: #0a0a0a;
+    --carbon: #f2f2f0;
+    color-scheme: dark;
+  }
+}
+
+:root,
+.tone-base {
+  --bg: var(--paper);
+  --ink: var(--carbon);
+}
+
+.tone-invert {
+  --bg: var(--carbon);
+  --ink: var(--paper);
+}
+
+:root,
+.tone-base,
+.tone-invert {
+  /* Concreto: cinza de superfície e cinza de texto secundário, sempre da mesma tinta. */
+  --surface: color-mix(in oklab, var(--ink) 5%, var(--bg));
+  --border: var(--ink);
+  --hairline: color-mix(in oklab, var(--ink) 16%, var(--bg));
+  --ink-quiet: color-mix(in oklab, var(--ink) 68%, var(--bg));
+  --accent: var(--ink);
+  --accent-ink: var(--bg);
 }
 
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-border: var(--border);
+  --color-hairline: var(--hairline);
   --color-ink: var(--ink);
   --color-ink-quiet: var(--ink-quiet);
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
 
-  --font-display: var(--font-source-serif), Georgia, serif;
+  /* Uma família só, em pesos extremos: o título é peso 800, o corpo 400. */
+  --font-display: var(--font-inter), system-ui, sans-serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
-  /* Escala tipográfica fluida: sem breakpoint para título. */
-  --text-hero: clamp(2.5rem, 6vw, 4.25rem);
-  --text-hero--line-height: 1.05;
-  --text-h2: clamp(1.75rem, 3.5vw, 2.5rem);
-  --text-h2--line-height: 1.15;
+  /* Escala fluida. O limite de cima é a palavra mais longa da copy em caixa alta
+   * ("INFRAESTRUTURA,") caber na coluna de texto: o E2E `typography.spec.ts` mede. */
+  --text-hero: clamp(2rem, 2.6vw + 1rem, 3.5rem);
+  /* Caixa alta acentuada (Ã, Ç) colide abaixo de ~1.04. */
+  --text-hero--line-height: 1.04;
+  --text-hero--letter-spacing: -0.035em;
+  --text-hero--font-weight: 800;
+  --text-h2: clamp(1.625rem, 1.6vw + 1rem, 2.5rem);
+  --text-h2--line-height: 1.06;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h2--font-weight: 800;
 
-  --radius-sm: 6px;
-  --radius-lg: 14px;
+  /* Brutalismo: canto vivo. Os nomes ficam para não espalhar `rounded-none`. */
+  --radius-sm: 0px;
+  --radius-lg: 0px;
 }
 
 @theme {
@@ -59,6 +98,7 @@
 
 html {
   background: var(--bg);
+  font-synthesis: none;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -71,7 +111,7 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
 
@@ -112,7 +152,7 @@ body {
   transition: opacity 0.5s var(--ease-out);
   background: radial-gradient(
     circle at var(--spot-x, 50%) var(--spot-y, 50%),
-    color-mix(in oklab, var(--accent) 22%, transparent),
+    color-mix(in oklab, var(--ink) 9%, transparent),
     transparent 70%
   );
 }
@@ -120,6 +160,27 @@ body {
 .spotlight-card:hover::before,
 .spotlight-card:focus-within::before {
   opacity: 1;
+}
+
+/* Sombra dura deslocada no hover: o "bloco" sai da parede. Sem desfoque, sem raio. */
+.spotlight-card {
+  transition:
+    transform 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out);
+}
+
+.spotlight-card:hover,
+.spotlight-card:focus-within {
+  transform: translate(-4px, -4px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+/* Título monumental: caixa alta em peso 800. Classe à parte de `text-hero`/`text-h2`
+ * porque o Tailwind não carrega text-transform no token de tamanho. */
+.display-caps {
+  text-transform: uppercase;
+  font-kerning: normal;
+  hyphens: manual;
 }
 
 /* Borda com dois brilhos correndo. Adaptado de React Bits "StarBorder". */
@@ -168,7 +229,7 @@ body {
 /* Grade de fundo das seções técnicas, com um halo que acende as linhas perto do
  * ponteiro. Inspirado em React Bits "ShapeGrid", sem loop de canvas: custo zero parado. */
 .grid-backdrop {
-  --grid-line: color-mix(in oklab, var(--ink) 7%, transparent);
+  --grid-line: color-mix(in oklab, var(--ink) 8%, transparent);
   --grid-cell: 48px;
   background-image:
     linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
@@ -186,12 +247,12 @@ body {
   background-image:
     linear-gradient(
       to right,
-      color-mix(in oklab, var(--accent) 55%, transparent) 1px,
+      color-mix(in oklab, var(--ink) 35%, transparent) 1px,
       transparent 1px
     ),
     linear-gradient(
       to bottom,
-      color-mix(in oklab, var(--accent) 55%, transparent) 1px,
+      color-mix(in oklab, var(--ink) 35%, transparent) 1px,
       transparent 1px
     );
   background-size: var(--grid-cell) var(--grid-cell);
@@ -253,6 +314,11 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .spotlight-card:hover,
+  .spotlight-card:focus-within {
+    transform: none;
+  }
+
   .word-in,
   .star-border > .star,
   .ticker-track {

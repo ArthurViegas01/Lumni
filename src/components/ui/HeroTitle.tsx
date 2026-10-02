@@ -6,7 +6,7 @@
 export function HeroTitle({ text, className = "" }: { text: string; className?: string }) {
   const words = text.split(" ");
   return (
-    <h1 aria-label={text} className={`font-display text-hero text-ink ${className}`}>
+    <h1 aria-label={text} className={`display-caps text-hero text-ink ${className}`}>
       {words.map((word, i) => (
         <span key={`${word}-${i}`} aria-hidden>
           <span className="word-in" style={{ ["--i" as string]: i }}>

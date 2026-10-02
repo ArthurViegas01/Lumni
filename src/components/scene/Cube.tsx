@@ -1,8 +1,8 @@
 "use client";
 
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import type { MotionValue } from "motion/react";
-import { type RefObject, useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react";
 import {
   BoxGeometry,
   Color,
@@ -13,14 +13,18 @@ import {
   Vector3,
 } from "three";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
-import { SCENE_COLORS } from "./color";
+import type { ScenePalette } from "./color";
+import { createConcreteTextures } from "./concrete";
 import { cubeStateAt, idleWeightAt, labelWeightOf, solidOpacityOf, spreadOf } from "./cubeState";
+import { createRng, createTwistState, inLayer, stepTwist } from "./twist";
 import type { CalloutElements, PointerState } from "./types";
 
 const AXIS = [-1, 0, 1] as const;
 /** Posição montada de cada uma das 27 peças. Índice = (x+1)*9 + (y+1)*3 + (z+1). */
 const HOME = AXIS.flatMap((x) => AXIS.flatMap((y) => AXIS.map((z) => new Vector3(x, y, z))));
 const PIECE_SIZE = 0.96;
+/** Profundidade aparente do caixilho e do sulco (relevo da textura). */
+const BUMP_SCALE = 3;
 /** Abaixo desta largura (px do canvas) o cubo sobe e centraliza, acima do texto. */
 const NARROW_BREAKPOINT = 768;
 /** No mobile o cubo encolhe e sobe: o texto ocupa a metade de baixo. */
@@ -37,8 +41,12 @@ const CALLOUT_PIECES = [26, 8, 2, 0, 18, 24] as const;
 /** Distância, em px, entre a peça e o início do rótulo. */
 const CALLOUT_REACH = 56;
 
-const EDGE_ON_DARK = new Color(SCENE_COLORS.edgeOnDark);
-const EDGE_ON_LIGHT = new Color(SCENE_COLORS.edgeOnLight);
+/** Eixos de giro de camada, no espaço do cubo (x, y, z). */
+const TWIST_AXES = [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)] as const;
+/** Semente fixa: a sequência de giros é a mesma em toda visita (e nos testes visuais). */
+const TWIST_SEED = 0x1f3a;
+/** Giros só com a página no topo (o balanço ocioso quase cheio). */
+const TWIST_FROM_IDLE = 0.9;
 const scratch = new Vector3();
 const center = new Vector3();
 
@@ -52,7 +60,8 @@ function hideCallouts(callouts: CalloutElements) {
 function createGeometries() {
   const box = new BoxGeometry(PIECE_SIZE, PIECE_SIZE, PIECE_SIZE);
   const geometries = {
-    solid: new RoundedBoxGeometry(PIECE_SIZE, PIECE_SIZE, PIECE_SIZE, 3, 0.08),
+    // segments = 1: a "curva" do canto vira um chanfro reto, como aresta de concreto.
+    solid: new RoundedBoxGeometry(PIECE_SIZE, PIECE_SIZE, PIECE_SIZE, 1, 0.05),
     // Arestas de uma caixa reta: as da caixa arredondada viriam cheias de facetas.
     edges: new EdgesGeometry(box),
   };
@@ -68,23 +77,38 @@ type CubeProps = {
   pointerRef: RefObject<PointerState>;
   /** Rótulos e linhas da etapa 3, no DOM, posicionados aqui a cada frame. */
   calloutsRef?: RefObject<CalloutElements>;
+  /** Cores do modo atual (papel/carbono). Muda quando a pessoa inverte o site. */
+  palette: ScenePalette;
 };
 
-export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
+export function Cube({ progress, idle, pointerRef, calloutsRef, palette }: CubeProps) {
   const [geometry] = useState(createGeometries);
+  const [textures] = useState(createConcreteTextures);
+  const [rand] = useState(() => createRng(TWIST_SEED));
+  const twist = useRef(createTwistState(0));
   const group = useRef<Group>(null);
   const pieces = useRef<(Group | null)[]>([]);
   const solids = useRef<(MeshStandardMaterial | null)[]>([]);
   const edges = useRef<(LineBasicMaterial | null)[]>([]);
   const state = useRef(cubeStateAt(0));
   const tilt = useRef<PointerState>({ x: 0, y: 0 });
+  const invalidate = useThree((s) => s.invalidate);
+  // Aresta com o cubo sólido = fresta da cor do papel; na planta técnica = tinta.
+  const edgeColors = useMemo(
+    () => ({ seam: new Color(palette.bg), plan: new Color(palette.ink) }),
+    [palette],
+  );
+  // frameloop="demand": a troca de modo precisa pedir um frame.
+  useEffect(() => invalidate(), [edgeColors, invalidate]);
 
   useEffect(
     () => () => {
       geometry.solid.dispose();
       geometry.edges.dispose();
+      textures.map.dispose();
+      textures.bump.dispose();
     },
-    [geometry],
+    [geometry, textures],
   );
 
   useFrame((frame, delta) => {
@@ -111,12 +135,32 @@ export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
     root.scale.setScalar(s.scale * (narrow ? NARROW_SCALE : 1));
     root.rotation.set(s.rotX + t.y * TILT, s.rotY + sway + t.x * TILT, 0);
 
-    // Sólido -> planta técnica: o sólido some e as arestas escurecem para o fundo claro.
+    // Giro de camada (só no topo). Ao terminar, angle = 0 e a camada volta à origem:
+    // as peças são idênticas, então o cubo fica visualmente igual (ver twist.ts).
+    const angle = stepTwist(
+      twist.current,
+      frame.clock.elapsedTime,
+      idle && idleWeight > TWIST_FROM_IDLE,
+      rand,
+    );
+    const move = twist.current.move;
+    const twistAxis = move ? TWIST_AXES[move.axis] : null;
+
+    // Sólido -> planta técnica: o sólido some e as arestas passam de fresta a traço.
     const spread = spreadOf(s);
     const solidOpacity = solidOpacityOf(s.edges);
     const edgeOpacity = 0.3 + 0.7 * s.edges;
     for (let i = 0; i < HOME.length; i++) {
-      pieces.current[i]?.position.copy(HOME[i]!).multiplyScalar(spread);
+      const piece = pieces.current[i];
+      if (piece) {
+        piece.position.copy(HOME[i]!).multiplyScalar(spread);
+        if (twistAxis && move && angle !== 0 && inLayer(HOME[i]!, move)) {
+          piece.position.applyAxisAngle(twistAxis, angle);
+          piece.quaternion.setFromAxisAngle(twistAxis, angle);
+        } else {
+          piece.quaternion.identity();
+        }
+      }
 
       const solid = solids.current[i];
       if (solid) {
@@ -126,7 +170,7 @@ export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
       }
       const edge = edges.current[i];
       if (edge) {
-        edge.color.lerpColors(EDGE_ON_DARK, EDGE_ON_LIGHT, s.edges);
+        edge.color.lerpColors(edgeColors.seam, edgeColors.plan, s.edges);
         edge.opacity = edgeOpacity;
       }
     }
@@ -175,7 +219,7 @@ export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
     }
 
     // frameloop="demand": só pede o próximo frame enquanto algo se move sozinho.
-    if (idleWeight > 0.001 || tilting) frame.invalidate();
+    if (idleWeight > 0.001 || tilting || twist.current.move) frame.invalidate();
   });
 
   return (
@@ -192,9 +236,12 @@ export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
               ref={(material) => {
                 solids.current[i] = material;
               }}
-              color={SCENE_COLORS.solid}
-              metalness={0.15}
-              roughness={0.55}
+              color={palette.solid}
+              map={textures.map}
+              bumpMap={textures.bump}
+              bumpScale={BUMP_SCALE}
+              metalness={0}
+              roughness={0.92}
               transparent
             />
           </mesh>
@@ -203,7 +250,7 @@ export function Cube({ progress, idle, pointerRef, calloutsRef }: CubeProps) {
               ref={(material) => {
                 edges.current[i] = material;
               }}
-              color={SCENE_COLORS.edgeOnDark}
+              color={palette.bg}
               transparent
               opacity={0.3}
             />

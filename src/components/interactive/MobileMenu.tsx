@@ -79,7 +79,7 @@ export function MobileMenu({ links, cta, language, openLabel, closeLabel }: Mobi
         <m.div
           ref={panelRef}
           id={panelId}
-          className="theme-dark fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col justify-between bg-bg px-4 pt-8 pb-10 md:hidden"
+          className="tone-base fixed inset-x-0 top-16 bottom-0 z-40 flex flex-col justify-between bg-bg px-4 pt-8 pb-10 md:hidden"
           initial={{ opacity: 0, y: reduce ? 0 : -8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
@@ -97,7 +97,7 @@ export function MobileMenu({ links, cta, language, openLabel, closeLabel }: Mobi
                   <a
                     href={link.href}
                     onClick={close}
-                    className="block border-b border-border py-4 font-display text-3xl text-ink"
+                    className="display-caps block border-b border-border py-4 text-3xl font-extrabold tracking-tight text-ink"
                   >
                     {link.label}
                   </a>
@@ -116,7 +116,7 @@ export function MobileMenu({ links, cta, language, openLabel, closeLabel }: Mobi
             <a
               href={cta.href}
               onClick={close}
-              className="rounded-sm bg-accent px-5 py-3 font-medium text-accent-ink"
+              className="border border-ink bg-ink px-5 py-3 font-semibold text-bg uppercase"
             >
               {cta.label}
             </a>

@@ -2,8 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const VARIANTS = {
-  primary: "bg-accent text-accent-ink hover:opacity-90",
-  secondary: "border border-border text-ink hover:border-ink-quiet",
+  primary: "border border-ink bg-ink text-bg hover:bg-bg hover:text-ink",
+  secondary: "border border-ink text-ink hover:bg-ink hover:text-bg",
   ghost: "text-ink-quiet hover:text-ink",
 } as const;
 
@@ -31,7 +31,7 @@ export function Button({
   size = "lg",
   className = "",
 }: ButtonProps) {
-  const classes = `inline-flex items-center justify-center gap-2 rounded-sm font-medium whitespace-nowrap transition-[opacity,border-color,color] ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
+  const classes = `inline-flex items-center justify-center gap-2 font-semibold tracking-tight whitespace-nowrap uppercase transition-colors ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
 
   if (href.startsWith("/")) {
     return (

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 const SIZES = {
-  hero: "font-display text-hero text-ink",
-  h2: "font-display text-h2 text-ink",
-  h3: "text-xl font-medium text-ink",
+  hero: "display-caps text-hero text-ink",
+  h2: "display-caps text-h2 text-ink",
+  h3: "text-xl font-bold tracking-tight text-ink",
 } as const;
 
 type HeadingProps = {

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LanguageLink } from "@/components/interactive/LanguageLink";
 import { MobileMenu } from "@/components/interactive/MobileMenu";
+import { ThemeToggle } from "@/components/interactive/ThemeToggle";
 import { alternateLocale, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { resolveNavLinks } from "@/i18n/navigation";
@@ -19,10 +20,10 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
   };
 
   return (
-    <header className="theme-dark fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-bg/80 backdrop-blur">
+    <header className="tone-base fixed inset-x-0 top-0 z-50 border-b border-border bg-bg">
       <a
         href="#conteudo"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-4 focus:rounded-sm focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-ink"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-4 focus:bg-ink focus:px-3 focus:py-2 focus:text-bg"
       >
         {nav.skip}
       </a>
@@ -30,7 +31,7 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
         <Link
           href={href(locale, { name: "home" })}
           aria-label={nav.home}
-          className="font-display text-xl font-semibold tracking-tight text-ink"
+          className="text-xl font-extrabold tracking-tighter text-ink uppercase"
         >
           {site.name}
         </Link>
@@ -41,7 +42,7 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="text-sm text-ink-quiet transition-colors hover:text-ink"
+                  className="text-sm font-medium text-ink-quiet uppercase transition-colors hover:text-ink"
                 >
                   {link.label}
                 </Link>
@@ -55,14 +56,15 @@ export function SiteHeader({ locale, nav }: SiteHeaderProps) {
             target={language.target}
             label={language.label}
             ariaLabel={language.ariaLabel}
-            className="hidden rounded-sm px-2 py-1 font-mono text-xs tracking-wide text-ink-quiet uppercase hover:text-ink md:inline-block"
+            className="hidden px-2 py-1 font-mono text-xs tracking-wide text-ink-quiet uppercase hover:text-ink md:inline-block"
           />
           <Link
             href={cta.href}
-            className="hidden rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-ink transition-opacity hover:opacity-90 sm:inline-block"
+            className="hidden border border-ink bg-ink px-4 py-2 text-sm font-semibold text-bg uppercase transition-colors hover:bg-bg hover:text-ink sm:inline-block"
           >
             {cta.label}
           </Link>
+          <ThemeToggle toDarkLabel={nav.themeToDark} toLightLabel={nav.themeToLight} />
           <MobileMenu
             links={links}
             cta={cta}

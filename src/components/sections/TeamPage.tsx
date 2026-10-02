@@ -21,7 +21,7 @@ export function TeamPage({
   return (
     <>
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <Section theme="light" aria-labelledby="especialidades-titulo">
+      <Section aria-labelledby="especialidades-titulo">
         <SectionHeading id="especialidades-titulo" title={page.specialtiesTitle} />
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {page.specialties.map((item, i) => (

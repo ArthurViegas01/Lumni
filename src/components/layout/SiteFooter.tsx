@@ -33,13 +33,13 @@ export function SiteFooter({ locale, footer, nav }: SiteFooterProps) {
   ];
 
   return (
-    <footer className="theme-dark border-t border-border/60 bg-bg">
+    <footer className="tone-invert bg-bg">
       <div className="mx-auto grid max-w-site gap-10 px-4 py-14 md:grid-cols-[2fr_1fr_1fr_1fr] md:px-8">
         <div className="max-w-xs">
           <Link
             href={href(locale, { name: "home" })}
             aria-label={nav.home}
-            className="font-display text-xl font-semibold tracking-tight text-ink"
+            className="text-xl font-extrabold tracking-tighter text-ink uppercase"
           >
             {site.name}
           </Link>
@@ -81,7 +81,7 @@ export function SiteFooter({ locale, footer, nav }: SiteFooterProps) {
           </li>
         </FooterColumn>
       </div>
-      <div className="mx-auto max-w-site border-t border-border/60 px-4 py-6 text-xs text-ink-quiet md:px-8">
+      <div className="mx-auto max-w-site border-t border-hairline px-4 py-6 text-xs text-ink-quiet md:px-8">
         © {new Date().getFullYear()} {site.name}. {footer.rights}
       </div>
     </footer>

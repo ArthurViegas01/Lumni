@@ -36,19 +36,58 @@ const FACES = {
   ),
 };
 
+/** Caixilho recuado (70% do lado da peça) e tirante (8%) de cada face visível. */
+const PANELS = [
+  ...range.flatMap((i) => range.map((j) => cell(add(times(A, i), times(B, j)), A, B, 0.62))),
+  ...range.flatMap((i) =>
+    range.map((k) => cell(add(times(B, 3), times(A, i), times(C, k)), A, C, 0.62)),
+  ),
+  ...range.flatMap((j) =>
+    range.map((k) => cell(add(times(A, 3), times(B, j), times(C, k)), B, C, 0.62)),
+  ),
+];
+const TIES = [
+  ...range.flatMap((i) => range.map((j) => cell(add(times(A, i), times(B, j)), A, B, 0.08))),
+  ...range.flatMap((i) =>
+    range.map((k) => cell(add(times(B, 3), times(A, i), times(C, k)), A, C, 0.08)),
+  ),
+  ...range.flatMap((j) =>
+    range.map((k) => cell(add(times(A, 3), times(B, j), times(C, k)), B, C, 0.08)),
+  ),
+];
+
+/** Três tons da tinta: face de cima mais clara, laterais mais fechadas (luz de cima). */
+const SHADE = {
+  top: "color-mix(in oklab, var(--ink) 78%, var(--bg))",
+  left: "color-mix(in oklab, var(--ink) 92%, var(--bg))",
+  right: "var(--ink)",
+} as const;
+
 export function CubePoster() {
   return (
     <div className="absolute top-[26%] left-1/2 w-[58vw] max-w-[420px] -translate-x-1/2 -translate-y-1/2 md:top-1/2 md:left-[74%] md:w-[22vw]">
       <svg viewBox="-110 -6 220 252" className="h-auto w-full" role="presentation">
-        <g stroke="#9aa7b4" strokeOpacity="0.35" strokeWidth="0.8">
+        {/* Cores por token: o pôster inverte junto com o site, sem JavaScript. Mesmo
+            desenho das peças 3D (concrete.ts): módulo, caixilho recuado e tirante. */}
+        <g style={{ stroke: "var(--bg)" }} strokeWidth="1.2">
           {FACES.top.map((points) => (
-            <polygon key={`t${points}`} points={points} fill="#4a5664" />
+            <polygon key={`t${points}`} points={points} style={{ fill: SHADE.top }} />
           ))}
           {FACES.left.map((points) => (
-            <polygon key={`l${points}`} points={points} fill="#343e4a" />
+            <polygon key={`l${points}`} points={points} style={{ fill: SHADE.left }} />
           ))}
           {FACES.right.map((points) => (
-            <polygon key={`r${points}`} points={points} fill="#262f39" />
+            <polygon key={`r${points}`} points={points} style={{ fill: SHADE.right }} />
+          ))}
+        </g>
+        <g style={{ stroke: "var(--bg)", strokeOpacity: 0.28 }} strokeWidth="0.8" fill="none">
+          {PANELS.map((points) => (
+            <polygon key={`p${points}`} points={points} />
+          ))}
+        </g>
+        <g style={{ fill: "var(--bg)", fillOpacity: 0.35 }}>
+          {TIES.map((points) => (
+            <polygon key={`c${points}`} points={points} />
           ))}
         </g>
       </svg>

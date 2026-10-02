@@ -18,7 +18,7 @@ export function SupplierSection({ data }: { data: Sections["supplier"] }) {
   };
 
   return (
-    <Section theme="light" aria-labelledby="problema-titulo">
+    <Section aria-labelledby="problema-titulo">
       <SectionHeading
         id="problema-titulo"
         eyebrow={data.eyebrow}
@@ -29,7 +29,7 @@ export function SupplierSection({ data }: { data: Sections["supplier"] }) {
         {(["before", "after"] as const).map((variant) => (
           <figure
             key={variant}
-            className={`rounded-lg border p-6 ${variant === "after" ? "border-accent/40 bg-surface" : "border-border"}`}
+            className={`rounded-lg border p-6 ${variant === "after" ? "border-ink bg-surface" : "border-hairline"}`}
           >
             <p className="font-mono text-xs tracking-widest text-ink-quiet uppercase">
               {data[variant].title}
@@ -62,7 +62,7 @@ export function ProcessSection({ data }: { data: Sections["process"] }) {
 /** Faixa de tecnologias em loop. */
 export function StackSection({ data }: { data: Sections["stack"] }) {
   return (
-    <section className="theme-dark border-y border-border bg-bg py-10" aria-label={data.title}>
+    <section className="tone-invert border-y border-border bg-bg py-10" aria-label={data.title}>
       <div className="mx-auto mb-6 max-w-site px-4 md:px-8">
         <p className="font-mono text-xs tracking-widest text-ink-quiet uppercase">
           {data.eyebrow} · {data.title}
@@ -76,7 +76,7 @@ export function StackSection({ data }: { data: Sections["stack"] }) {
 /** Perguntas frequentes da home. */
 export function FaqSection({ data }: { data: Sections["faq"] }) {
   return (
-    <Section id="faq" theme="light" surface aria-labelledby="faq-titulo">
+    <Section id="faq" surface aria-labelledby="faq-titulo">
       <div className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:gap-20">
         <SectionHeading id="faq-titulo" eyebrow={data.eyebrow} title={data.title} />
         <FaqList items={data.items} />
@@ -88,7 +88,7 @@ export function FaqSection({ data }: { data: Sections["faq"] }) {
 /** Chamada final da home, alvo dos CTAs de todo o site. O formulário entra na Fase 6. */
 export function ContactSection({ data }: { data: Sections["contact"] }) {
   return (
-    <Section id="contato" theme="dark" aria-labelledby="contato-titulo" className="text-center">
+    <Section id="contato" tone="invert" aria-labelledby="contato-titulo" className="text-center">
       <GridBackdrop />
       <SectionHeading
         id="contato-titulo"

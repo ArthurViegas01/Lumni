@@ -42,7 +42,7 @@ src/
     [locale]/            layout raiz (html lang, fontes, header/footer) e páginas por idioma
     fonts/               woff2 auto-hospedados + licenças OFL
     fonts.ts             declaração das fontes (next/font/local)
-    globals.css          tokens da direção de arte híbrida (Tailwind 4 @theme)
+    globals.css          tokens brutalistas papel/carbono e modo invertido (Tailwind 4 @theme)
     global-not-found.tsx 404 de URLs sem rota
     robots.ts sitemap.ts icon.svg
   proxy.ts               redireciona "/" para /pt ou /en pelo Accept-Language

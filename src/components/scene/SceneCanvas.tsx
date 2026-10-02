@@ -3,7 +3,8 @@
 import { Canvas, useThree } from "@react-three/fiber";
 import { type MotionValue, useMotionValueEvent } from "motion/react";
 import { type RefObject, useEffect, useRef } from "react";
-import { SCENE_COLORS } from "./color";
+import { useTheme } from "@/components/interactive/theme-store";
+import { SCENE_PALETTE } from "./color";
 import { Cube } from "./Cube";
 import type { CalloutElements, PointerState } from "./types";
 
@@ -21,10 +22,14 @@ type SceneCanvasProps = {
  */
 export default function SceneCanvas({ progress, idle, calloutsRef, onReady }: SceneCanvasProps) {
   const pointerRef = useRef<PointerState>({ x: 0, y: 0 });
+  const palette = SCENE_PALETTE[useTheme()];
 
   return (
     <Canvas
       frameloop="demand"
+      // Sem tone mapping: o ACES padrão do R3F comprime o branco para cinza e o cubo
+      // do modo invertido sairia cinza. Num site monocromático a cor tem de ser a do token.
+      flat
       dpr={[1, 1.5]}
       camera={{ position: [0, 0, 9], fov: 35 }}
       gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
@@ -32,10 +37,18 @@ export default function SceneCanvas({ progress, idle, calloutsRef, onReady }: Sc
     >
       <InvalidateOn value={progress} />
       {idle && <PointerTracker pointerRef={pointerRef} />}
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[4, 6, 5]} intensity={1.3} />
-      <directionalLight position={[-5, -2, -4]} intensity={0.6} color={SCENE_COLORS.rimLight} />
-      <Cube progress={progress} idle={idle} pointerRef={pointerRef} calloutsRef={calloutsRef} />
+      {/* Luz dura de cima e da direita, preenchimento fraco: faces bem separadas,
+          como concreto ao sol. Monocromática (D26). */}
+      <ambientLight intensity={palette.light.ambient} />
+      <directionalLight position={[4, 6, 5]} intensity={palette.light.key} />
+      <directionalLight position={[-5, -1, 2]} intensity={palette.light.fill} />
+      <Cube
+        progress={progress}
+        idle={idle}
+        pointerRef={pointerRef}
+        calloutsRef={calloutsRef}
+        palette={palette}
+      />
     </Canvas>
   );
 }

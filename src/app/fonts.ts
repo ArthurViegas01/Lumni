@@ -6,13 +6,6 @@ import localFont from "next/font/local";
  * para o build não depender de acesso ao Google (CI, redes corporativas) e o navegador
  * nunca falar com terceiros (LGPD).
  */
-export const serif = localFont({
-  src: "./fonts/source-serif-4-latin-wght.woff2",
-  variable: "--font-source-serif",
-  weight: "200 900",
-  display: "swap",
-});
-
 export const sans = localFont({
   src: "./fonts/inter-latin-wght.woff2",
   variable: "--font-inter",
@@ -29,4 +22,4 @@ export const mono = localFont({
   preload: false,
 });
 
-export const fontVariables = `${serif.variable} ${sans.variable} ${mono.variable}`;
+export const fontVariables = `${sans.variable} ${mono.variable}`;

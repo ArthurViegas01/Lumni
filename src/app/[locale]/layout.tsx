@@ -6,6 +6,7 @@ import { MotionProvider } from "@/components/motion/MotionProvider";
 import { hasLocale, htmlLang, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { site } from "@/lib/site";
+import { themeInitScript } from "@/lib/theme";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
@@ -27,7 +28,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const dict = await getDictionary(locale);
 
   return (
-    <html lang={htmlLang[locale]} className={fontVariables}>
+    // suppressHydrationWarning: o script do <head> define data-theme antes da hidratação,
+    // de propósito. Vale só para os atributos do próprio <html>, não para os filhos.
+    <html lang={htmlLang[locale]} className={fontVariables} suppressHydrationWarning>
+      <head>
+        {/* Antes de qualquer CSS pintar: modo salvo ou do sistema, sem piscar. */}
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <MotionProvider>
           <SiteHeader locale={locale} nav={dict.nav} />

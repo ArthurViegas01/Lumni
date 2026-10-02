@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   type CubeState,
   KEYFRAMES,
-  backgroundLightnessOf,
   cubeStateAt,
   idleWeightAt,
   labelWeightOf,
@@ -95,18 +94,15 @@ describe("idleWeightAt", () => {
 });
 
 describe("curvas derivadas de edges", () => {
-  it("o sólido some antes do fundo clarear", () => {
+  it("o sólido some na primeira metade da transição para traço", () => {
     expect(solidOpacityOf(0)).toBe(1);
     expect(solidOpacityOf(0.5)).toBe(0);
     expect(solidOpacityOf(1)).toBe(0);
-    expect(backgroundLightnessOf(0.25)).toBe(0);
-    expect(backgroundLightnessOf(0.75)).toBe(1);
   });
 
   it("são monotônicas", () => {
     for (let e = 0; e < 1; e += 0.01) {
       expect(solidOpacityOf(e + 0.01)).toBeLessThanOrEqual(solidOpacityOf(e));
-      expect(backgroundLightnessOf(e + 0.01)).toBeGreaterThanOrEqual(backgroundLightnessOf(e));
     }
   });
 });

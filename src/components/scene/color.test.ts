@@ -1,19 +1,26 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { mixHex } from "./color";
+import { SCENE_PALETTE } from "./color";
 
-describe("mixHex", () => {
-  it("devolve as pontas em 0 e 1", () => {
-    expect(mixHex("#000000", "#ffffff", 0)).toBe("rgb(0 0 0)");
-    expect(mixHex("#000000", "#ffffff", 1)).toBe("rgb(255 255 255)");
+const css = readFileSync(new URL("../../app/globals.css", import.meta.url), "utf8");
+
+/** Valor de `--name` no primeiro bloco cujo seletor é exatamente `selector`. */
+function tokenIn(selector: string, name: string): string {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const block = new RegExp(`(?:^|\\n)${escaped}\\s*\\{([^}]*)\\}`).exec(css)?.[1];
+  const value = block && new RegExp(`--${name}:\\s*([^;]+);`).exec(block)?.[1];
+  if (!value) throw new Error(`--${name} não encontrado em ${selector}`);
+  return value.trim().toLowerCase();
+}
+
+describe("SCENE_PALETTE espelha os tokens de globals.css", () => {
+  it("modo claro: tinta = carbono, fundo = papel", () => {
+    expect(SCENE_PALETTE.light.ink).toBe(tokenIn(":root", "carbon"));
+    expect(SCENE_PALETTE.light.bg).toBe(tokenIn(":root", "paper"));
   });
 
-  it("interpola e prende t fora de [0, 1]", () => {
-    expect(mixHex("#000000", "#ffffff", 0.5)).toBe("rgb(128 128 128)");
-    expect(mixHex("#0b0f14", "#ffffff", -1)).toBe("rgb(11 15 20)");
-    expect(mixHex("#0b0f14", "#ffffff", 2)).toBe("rgb(255 255 255)");
-  });
-
-  it("rejeita cor inválida", () => {
-    expect(() => mixHex("red", "#ffffff", 0)).toThrow();
+  it("modo invertido: papel e carbono trocados", () => {
+    expect(SCENE_PALETTE.dark.ink).toBe(tokenIn(':root[data-theme="dark"]', "carbon"));
+    expect(SCENE_PALETTE.dark.bg).toBe(tokenIn(':root[data-theme="dark"]', "paper"));
   });
 });

@@ -7,6 +7,69 @@ O mapa de versões até o lançamento (0.1 → 1.0) está em `PLANO_DE_IMPLEMENT
 
 _Nada ainda._
 
+## [0.5.0] - 2026-10-01
+
+Cubo mais detalhado e vivo no topo da página (decisões D29 e D30).
+
+### Adicionado
+
+- **Giros de camada de cubo mágico no topo da página:** uma camada gira 90° por vez (0,6 s, com aceleração e freio), pausa de 0,45 s, nunca duas vezes seguidas no mesmo eixo. Ao rolar, o giro em andamento termina e nenhum outro começa; ao voltar ao topo, recomeçam. Desligados com reduced motion e `?freeze=1`.
+- `scene/twist.ts`: cronograma dos giros como módulo puro, com 11 testes (sorteio determinístico, 9 peças por camada, ângulo limitado a 90°, término do giro ao rolar, pausa ao voltar).
+- **Peças como módulos de fachada brutalista** (`scene/concrete.ts`): chanfro reto nas arestas, caixilho recuado com sulco, tirante de fôrma no centro e granulação de concreto, desenhados em canvas no cliente (textura de cor + relevo). O mesmo desenho serve ao cubo preto e ao branco.
+- Pôster SVG com caixilho e tirante, igual às peças 3D.
+
+### Alterado
+
+- Albedo do cubo no modo claro de `#303030` para `#3a3a3a`, para o caixilho ler sobre o preto.
+- Pendência P14 (textura de concreto) respondida.
+
+### Medido nesta versão
+
+- JS inicial da home: 208 KB gzip (sem mudança). Chunk da cena 3D: **244 KB** gzip (antes 242; meta 250).
+- Texturas geradas no cliente: 2 × 512×512, zero bytes de imagem no bundle.
+- 67 testes de unidade; E2E completo passando.
+
+### Problemas conhecidos
+
+- Os giros pedem frames contínuos enquanto acontecem (só no topo). Medição em aparelho real continua pendente (roteiro 4.2).
+- O `next start` registra `NoFallbackError` no log quando alguém acessa um slug de serviço que não existe (ex.: `/pt/servicos/managed-it`). A resposta está certa (404, verificada no E2E); é ruído interno do Next com `dynamicParams = false`, presente desde a v0.3.0.
+
+## [0.4.0] - 2026-10-01
+
+Nova direção de arte: **brutalismo monocromático** com modo invertido (decisões D26–D28), no lugar da direção híbrida da v0.1.0.
+
+### Adicionado
+
+- **Botão de inverter cores na barra** (desktop e mobile): troca papel e carbono no site inteiro. A escolha fica salva; sem escolha, o site segue o modo do sistema, inclusive se ele mudar com a página aberta.
+- **Script síncrono no `<head>`** (`lib/theme.ts`): aplica o modo antes do primeiro paint, sem piscar. Sem JavaScript, o CSS segue `prefers-color-scheme`. Se o `localStorage` estiver bloqueado, a troca funciona mas não persiste.
+- `tone-base` / `tone-invert`: blocos de carbono que invertem junto com o modo.
+- Testes: regra do modo e o script do `<head>` executado nas 8 combinações de escolha e sistema (`theme.test.ts`); paleta da cena 3D contra os tokens do CSS (`color.test.ts`); E2E de modo (segue o sistema, botão, persistência, sem piscar, blocos invertidos), de tipografia (nenhum título estoura a coluna, sem rolagem horizontal) e axe nos dois modos.
+
+### Alterado
+
+- **Monocromático:** papel `#ffffff` e carbono `#0a0a0a`; azul e verde saíram. CTA e foco viram blocos sólidos de tinta.
+- **Tipografia:** títulos em Inter 800, caixa alta e entreletra negativa (`display-caps`). Source Serif 4 removida.
+- **Forma:** canto vivo em tudo, traço de 1px na cor da tinta, header opaco sem blur, cartões com sombra dura deslocada no hover, marcadores quadrados.
+- **Cubo 3D:** preto no modo claro e branco no invertido, arestas mais vivas, luz dura de cima, frestas na cor do papel; sem tone mapping, para a cor ser a do token. O fundo do hero deixou de animar de escuro para claro: é o papel do site.
+- Rótulos da etapa 3 em caixa com borda; pôster SVG do cubo pintado pelos tokens (inverte sem JavaScript).
+- Ritmo das seções: papel por padrão; "como trabalhamos", faixa de tecnologias, contato, chamada final e rodapé em carbono.
+
+### Removido
+
+- `mixHex` e `backgroundLightnessOf` (só serviam ao fundo animado do hero) e a fonte Source Serif 4.
+
+### Medido nesta versão
+
+- Fontes: **95 KB** (antes 139 KB).
+- JS inicial: home 208 KB gzip, demais páginas 204 KB (meta D21: 220 KB) — o botão de modo não mudou o total arredondado.
+- Contraste: ink-quiet sobre papel 8,5:1, sobre carbono 7,4:1 (antes 5,9:1 e 7,8:1).
+- 56 testes de unidade; E2E: 90 execuções passando (desktop + mobile, os dois modos no axe).
+
+### Problemas conhecidos
+
+- Textura de concreto no cubo (granulação) não foi feita; fica como pergunta (P14).
+- Continua valendo: copy provisória (P10, P12, P13), medição do hero em aparelho real, pôster SVG provisório.
+
 ## [0.3.0] - 2026-09-30
 
 Páginas de serviço, hub e time; URLs traduzidas em inglês; testes E2E com Playwright. Adianta a parte de rotas da Fase 8 (necessária para linkar as páginas novas) e cobre boa parte da Fase 5. **A copy das páginas novas é provisória** (Fase 2; pendências P10, P12 e P13).

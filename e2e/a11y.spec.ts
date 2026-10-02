@@ -6,35 +6,41 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 // Bloqueia a CI em violações "serious"/"critical" (WCAG 2.2 A/AA). As menores
 // entram no relatório do teste, sem travar o merge.
-for (const path of PAGES) {
-  test(`sem violações graves de acessibilidade em ${path}`, async ({ page }, testInfo) => {
-    await page.goto(path);
-    await settle(page);
+// Os dois modos de cor: papel/carbono e o invertido. Contraste tem de passar nos dois.
+for (const colorScheme of ["light", "dark"] as const) {
+  for (const path of PAGES) {
+    test(`sem violações graves de acessibilidade em ${path} (${colorScheme})`, async ({
+      page,
+    }, testInfo) => {
+      await page.emulateMedia({ colorScheme });
+      await page.goto(path);
+      await settle(page);
 
-    // As etapas da história ficam sobre um fundo animado pela rolagem (camada sticky
-    // com cor ligada ao progresso). O axe não resolve essa pilha e mede contra branco;
-    // o contraste delas é verificado com as cores reais no teste logo abaixo.
-    const results = await new AxeBuilder({ page })
-      .withTags(WCAG_TAGS)
-      .exclude("[data-stage]")
-      .analyze();
-    const stages = await new AxeBuilder({ page })
-      .withTags(WCAG_TAGS)
-      .include("[data-stage]")
-      .disableRules(["color-contrast"])
-      .analyze()
-      .catch(() => null); // página sem história: nada a incluir
+      // As etapas da história ficam sobre um fundo animado pela rolagem (camada sticky
+      // com cor ligada ao progresso). O axe não resolve essa pilha e mede contra branco;
+      // o contraste delas é verificado com as cores reais no teste logo abaixo.
+      const results = await new AxeBuilder({ page })
+        .withTags(WCAG_TAGS)
+        .exclude("[data-stage]")
+        .analyze();
+      const stages = await new AxeBuilder({ page })
+        .withTags(WCAG_TAGS)
+        .include("[data-stage]")
+        .disableRules(["color-contrast"])
+        .analyze()
+        .catch(() => null); // página sem história: nada a incluir
 
-    const violations = [...results.violations, ...(stages?.violations ?? [])];
-    await testInfo.attach("axe.json", {
-      body: JSON.stringify(violations, null, 2),
-      contentType: "application/json",
+      const violations = [...results.violations, ...(stages?.violations ?? [])];
+      await testInfo.attach("axe.json", {
+        body: JSON.stringify(violations, null, 2),
+        contentType: "application/json",
+      });
+      const blocking = violations
+        .filter((v) => v.impact === "serious" || v.impact === "critical")
+        .map((v) => `${v.id} (${v.nodes.length}): ${v.nodes[0]?.target.join(" ")}`);
+      expect(blocking).toEqual([]);
     });
-    const blocking = violations
-      .filter((v) => v.impact === "serious" || v.impact === "critical")
-      .map((v) => `${v.id} (${v.nodes.length}): ${v.nodes[0]?.target.join(" ")}`);
-    expect(blocking).toEqual([]);
-  });
+  }
 }
 
 test("história da home: texto de cada etapa contrasta com o fundo real do palco", async ({

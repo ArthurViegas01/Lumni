@@ -61,7 +61,7 @@ export function ServicesHub({
   return (
     <>
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
-      <Section theme="light" aria-label={page.title}>
+      <Section aria-label={page.title}>
         <ul className="grid gap-4 md:grid-cols-2">
           {services.map((service, i) => (
             <li key={service.id}>
@@ -121,7 +121,7 @@ export function ServiceDetail({
         }
       />
 
-      <Section theme="light" aria-labelledby="incluso-titulo">
+      <Section aria-labelledby="incluso-titulo">
         <SectionHeading id="incluso-titulo" title={labels.included} />
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {content.included.map((item, i) => (
@@ -144,7 +144,7 @@ export function ServiceDetail({
         steps={content.steps}
       />
 
-      <Section theme="light" surface aria-labelledby="escopo-titulo">
+      <Section surface aria-labelledby="escopo-titulo">
         <div className="grid gap-12 md:grid-cols-2 md:gap-20">
           <div>
             <SectionHeading id="escopo-titulo" title={labels.excluded} lead={labels.excludedLead} />
@@ -161,20 +161,20 @@ export function ServiceDetail({
             <p className="font-mono text-xs tracking-widest text-accent uppercase">
               {labels.pricing}
             </p>
-            <h3 className="mt-3 font-display text-h2 text-ink">{content.pricing.title}</h3>
+            <h3 className="display-caps mt-3 text-h2 text-ink">{content.pricing.title}</h3>
             <p className="mt-4 text-ink-quiet">{content.pricing.text}</p>
           </div>
         </div>
       </Section>
 
-      <Section theme="light" aria-labelledby="faq-servico-titulo">
+      <Section aria-labelledby="faq-servico-titulo">
         <div className="grid gap-12 md:grid-cols-[1fr_1.4fr] md:gap-20">
           <SectionHeading id="faq-servico-titulo" title={labels.faq} />
           <FaqList items={content.faq} />
         </div>
       </Section>
 
-      <Section theme="light" surface aria-labelledby="outras-titulo">
+      <Section surface aria-labelledby="outras-titulo">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <SectionHeading id="outras-titulo" title={labels.others} />
           <a

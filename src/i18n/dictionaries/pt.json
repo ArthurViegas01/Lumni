@@ -12,6 +12,8 @@
     "label": "Principal",
     "openMenu": "Abrir menu",
     "closeMenu": "Fechar menu",
+    "themeToDark": "Mudar para fundo preto",
+    "themeToLight": "Mudar para fundo branco",
     "links": [
       {
         "label": "Serviços",
